@@ -2,7 +2,7 @@
 """
 scripts/run_tree_segmentation.py
 
-Step 2: Vegetation filtering (HOMED) + Segmentation for all tiles of a case.
+Step 2: Vegetation filtering (HOMED) + Segmentation (TreeSeparation) + Forest ID generalization.
 
 Example:
     nohup python -m scripts.run_tree_segmentation --case wippolder --n-cores 4 &
@@ -16,6 +16,7 @@ from pathlib import Path
 from src.config import get_config, setup_logger
 from src.vegetation_filter.HOMED_vegetation_filter import filter_tile
 from src.segmentation.segment_tile import segment_tile
+from src.segmentation.generalize_forest_ids import generalize_forest_ids
 
 
 # ---------------------------------------------------------------------
@@ -49,10 +50,10 @@ def process_tile(tile_dir: Path, overwrite: bool = False) -> dict:
 # Runner main
 # ---------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description="Run vegetation filtering and segmentation for all tiles of a case.")
+    parser = argparse.ArgumentParser(description="Run vegetation filtering, segmentation, and forest ID generalization.")
     parser.add_argument("--case", type=str, help="Case name (default from config)")
     parser.add_argument("--n-cores", type=int, default=None, help="Number of parallel workers (default from config)")
-    parser.add_argument("--overwrite", action="store_true", help="Re-run even if vegetation/segmentation exists")
+    parser.add_argument("--overwrite", action="store_true", help="Re-run even if outputs exist")
     parser.add_argument("--log-level", default="INFO", help="Logging level (DEBUG, INFO, WARNING)")
     parser.add_argument("--dry-run", action="store_true", help="List tiles only, no processing")
     args = parser.parse_args()
@@ -105,7 +106,39 @@ def main():
             result = process_tile(td, args.overwrite)
             logging.info(f"[{td.name}] {result['status'].upper()}")
 
+    # ------------------------------------------------------------------
+    # Step 3: Forest generalization
+    # ------------------------------------------------------------------
+    try:
+        out_forest_hulls = cfg["data_root"] / case / "forest_hulls.geojson"
+        out_gtid_map = cfg["data_root"] / case / "gtid_map.csv"
+
+        # Skip if already exists and overwrite not requested
+        if (out_forest_hulls.exists() and out_gtid_map.exists()) and not args.overwrite:
+            logging.info(
+                f"Forest generalization outputs already exist — skipped "
+                f"(use --overwrite to regenerate)."
+            )
+        else:
+            logging.info("Starting forest ID generalization...")
+            result_generalize = generalize_forest_ids(case, overwrite=args.overwrite)
+
+            if result_generalize["status"] == "ok":
+                logging.info(
+                    f"Forest generalization complete: {result_generalize['n_trees']} trees → "
+                    f"{result_generalize['outputs']['forest_hulls']} / "
+                    f"{result_generalize['outputs']['gtid_map']}"
+                )
+            else:
+                logging.warning(
+                    f"Forest generalization returned status: {result_generalize['status']}"
+                )
+
+    except Exception as e:
+        logging.error(f"Forest generalization failed: {e}")
+
     logging.info(f"Completed tree segmentation pipeline for case: {case}")
+
 
 
 # ---------------------------------------------------------------------
