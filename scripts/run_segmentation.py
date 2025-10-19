@@ -63,9 +63,12 @@ def main():
     case = args.case or cfg["case"]
     setup_logger(case, "tree_segmentation", args.log_level)
 
+    logging.info("=" * 80)
+    logging.info(f"Starting tree segmentation pipeline for case: {case}")
+    logging.info("=" * 80)
+
     # Resolve number of cores
     n_cores = args.n_cores or cfg["default_cores"]
-    logging.info(f"Starting tree segmentation pipeline for case: {case}")
     logging.info(f"Parallel workers: {n_cores}")
     logging.info(f"Overwrite: {args.overwrite}")
 
@@ -85,6 +88,10 @@ def main():
         for t in tile_dirs:
             logging.info(f"[DRY RUN] Would process tile: {t.name}")
         return
+
+    logging.info("=" * 80)
+    logging.info("STEP 1–2: Vegetation Filtering and Segmentation")
+    logging.info("=" * 80)
 
     # ------------------------------------------------------------------
     # Parallel or serial execution
@@ -106,38 +113,58 @@ def main():
             result = process_tile(td, args.overwrite)
             logging.info(f"[{td.name}] {result['status'].upper()}")
 
+    logging.info("=" * 80)
+    logging.info("STEP 3: Forest ID Generalization")
+    logging.info("=" * 80)
+
     # ------------------------------------------------------------------
     # Step 3: Forest generalization
     # ------------------------------------------------------------------
     try:
         out_forest_hulls = cfg["data_root"] / case / "forest_hulls.geojson"
-        out_gtid_map = cfg["data_root"] / case / "gtid_map.csv"
+        out_gtid_map     = cfg["data_root"] / case / "gtid_map.csv"
 
-        # Skip if already exists and overwrite not requested
-        if (out_forest_hulls.exists() and out_gtid_map.exists()) and not args.overwrite:
+        # Check per-tile forest.laz presence
+        missing_forest_tiles = [
+            td.name for td in tile_dirs
+            if not (td / "forest.laz").exists()
+        ]
+
+        # Skip only if case-level outputs exist AND all tiles already have forest.laz
+        if (out_forest_hulls.exists() and out_gtid_map.exists()
+            and not missing_forest_tiles and not args.overwrite):
             logging.info(
-                f"Forest generalization outputs already exist — skipped "
-                f"(use --overwrite to regenerate)."
+                "Forest generalization outputs already exist and all tiles have forest.laz — "
+                "skipping (use --overwrite to regenerate)."
             )
         else:
+            if missing_forest_tiles and not args.overwrite:
+                logging.info(
+                    "Forest generalization will run to fill missing forest.laz for tiles: "
+                    + ", ".join(missing_forest_tiles)
+                )
             logging.info("Starting forest ID generalization...")
             result_generalize = generalize_forest_ids(case, overwrite=args.overwrite)
 
-            if result_generalize["status"] == "ok":
+            if result_generalize.get("status") == "ok":
                 logging.info(
-                    f"Forest generalization complete: {result_generalize['n_trees']} trees → "
-                    f"{result_generalize['outputs']['forest_hulls']} / "
-                    f"{result_generalize['outputs']['gtid_map']}"
+                    "Forest generalization complete: %s trees → %s / %s",
+                    result_generalize["n_trees"],
+                    result_generalize["outputs"]["forest_hulls"],
+                    result_generalize["outputs"]["gtid_map"],
                 )
             else:
                 logging.warning(
-                    f"Forest generalization returned status: {result_generalize['status']}"
+                    "Forest generalization returned status: %s",
+                    result_generalize.get("status"),
                 )
 
     except Exception as e:
         logging.error(f"Forest generalization failed: {e}")
 
+    logging.info("=" * 80)
     logging.info(f"Completed tree segmentation pipeline for case: {case}")
+    logging.info("=" * 80)
 
 
 

@@ -146,16 +146,52 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
         # Join with GTID map
         tile_map = gtid_map[gtid_map["tile_id"] == tile_dir.name]
         if tile_map.empty:
-            logging.debug(f"[{tile_dir.name}] No GTIDs found for this tile — skipped.")
+            logging.warning(f"[{tile_dir.name}] No GTIDs found for this tile — skipped.")
             continue
 
-        seg_df = seg_df.merge(tile_map, on="tid", how="inner")
+        if "gtid" in seg_df.columns:
+            seg_df = seg_df.drop(columns=["gtid"])
+
+        seg_df = seg_df.merge(
+            tile_map[["tid", "gtid"]],
+            on="tid",
+            how="inner"
+        )
+
         if seg_df.empty:
             logging.debug(f"[{tile_dir.name}] No matching GTIDs after merge — skipped.")
             continue
 
 
         # Read vegetation.laz
+
+
+        # --- Debug diagnostics ----------------------------------------
+        logging.debug(f"[{tile_dir.name}] seg_df columns: {list(seg_df.columns)}")
+        logging.debug(f"[{tile_dir.name}] seg_df head:\n{seg_df.head(5)}")
+
+        tile_map = gtid_map[gtid_map["tile_id"] == tile_dir.name]
+        logging.debug(f"[{tile_dir.name}] tile_map rows: {len(tile_map)}")
+        logging.debug(f"[{tile_dir.name}] tile_map columns: {list(tile_map.columns)}")
+        logging.debug(f"[{tile_dir.name}] tile_map head:\n{tile_map.head(5)}")
+
+        # Drop old gtid if present
+        if "gtid" in seg_df.columns:
+            seg_df = seg_df.drop(columns=["gtid"])
+
+        # Join with GTID map
+        seg_df = seg_df.merge(
+            tile_map[["tid", "gtid"]],
+            on="tid",
+            how="inner"
+        )
+        logging.debug(f"[{tile_dir.name}] After merge seg_df columns: {list(seg_df.columns)}")
+        logging.debug(f"[{tile_dir.name}] seg_df rows after merge: {len(seg_df)}")
+
+        if "gtid" not in seg_df.columns:
+            logging.warning(f"[{tile_dir.name}] No 'gtid' column after merge — will cause forest.laz failure.")
+
+
         try:
             logging.debug(f"Reading vegetation LAS: {veg_path}")
             with laspy.open(veg_path) as src:
@@ -175,7 +211,7 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
             "y": np.asarray(las.y),
             "z": np.asarray(las.z),
         })
-        veg_df["gtid"] = pd.NA
+        # veg_df["gtid"] = pd.NA
 
         # Merge by nearest XYZ (within small tolerance)
         # We assume segmentation.xyz has same coordinates; exact match join is fine.
@@ -184,6 +220,11 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
             veg_df, seg_df[["x", "y", "z", "gtid"]],
             on=["x", "y", "z"], how="inner"
         )
+        logging.debug(f"[{tile_dir.name}] merged columns: {list(merged.columns)}")
+        logging.debug(f"[{tile_dir.name}] merged rows: {len(merged)}")
+        if "gtid" not in merged.columns:
+            logging.warning(f"[{tile_dir.name}] merged dataframe has no 'gtid' column.")
+
         if merged.empty:
             logging.debug(f"[{tile_dir.name}] No coordinate matches — skipped.")
             continue
