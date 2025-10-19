@@ -90,7 +90,7 @@ Runs for:
 
 ### overwrite settings
 ``` bash
-python -m scripts.run_get_pointclouds --case delft --n-cores 4 --buffer 50 --overwrite
+python -m scripts.run_get_pointclouds --case delft --n-cores 4 --buffer 20 --overwrite
 ```
 
 ### Dry-run mode (list intersecting tiles only)

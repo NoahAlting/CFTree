@@ -5,19 +5,10 @@
 # ----------------------------
 # CASES
 # ----------------------------
-# Ignore all cases by default
 cases/*
-
-# Keep the example case folder itself
 !cases/wippolder/
-
-# Keep only the static AOI input for the example case
 !cases/wippolder/city_bbox.geojson
-
-# Optional: keep README or metadata
 !cases/README.md
-
-# Ignore derived buffered polygons and logs inside cases
 cases/*/city_bbox_buffered.geojson
 cases/*/logs/
 cases/*/*.log
@@ -56,3 +47,19 @@ nohup.out
 # LOCAL CONFIG
 # ----------------------------
 cftree_config.yaml
+
+# ----------------------------
+# C++ BUILD ARTIFACTS (TreeSeparation)
+# ----------------------------
+# Keep the source code, ignore compiled files
+src/segmentation/TreeSeparation/build/
+src/segmentation/TreeSeparation/CMakeFiles/
+src/segmentation/TreeSeparation/CMakeCache.txt
+src/segmentation/TreeSeparation/Makefile
+src/segmentation/TreeSeparation/cmake_install.cmake
+src/segmentation/TreeSeparation/*.o
+src/segmentation/TreeSeparation/*.obj
+src/segmentation/TreeSeparation/*.exe
+src/segmentation/TreeSeparation/*.out
+src/segmentation/TreeSeparation/*.dll
+src/segmentation/TreeSeparation/*.pdb
