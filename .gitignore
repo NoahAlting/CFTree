@@ -1,0 +1,27 @@
+# Ignore everything in cases/
+cases/*
+
+# Allow the example case
+!cases/wippolder/
+!cases/wippolder/**
+
+# Optional: keep a README in the cases folder
+!cases/README.md
+
+# Ignore any large or generated data
+data/
+results/
+logs/
+tmp/
+
+# Python cache and temp files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment and IDE stuff
+.env
+.vscode/
+.idea/
+.DS_Store
