@@ -49,17 +49,27 @@ nohup.out
 cftree_config.yaml
 
 # ----------------------------
-# C++ BUILD ARTIFACTS (TreeSeparation)
+# C++ BUILD ARTIFACTS (General)
 # ----------------------------
-# Keep the source code, ignore compiled files
-src/segmentation/TreeSeparation/build/
-src/segmentation/TreeSeparation/CMakeFiles/
-src/segmentation/TreeSeparation/CMakeCache.txt
-src/segmentation/TreeSeparation/Makefile
-src/segmentation/TreeSeparation/cmake_install.cmake
-src/segmentation/TreeSeparation/*.o
-src/segmentation/TreeSeparation/*.obj
-src/segmentation/TreeSeparation/*.exe
-src/segmentation/TreeSeparation/*.out
-src/segmentation/TreeSeparation/*.dll
-src/segmentation/TreeSeparation/*.pdb
+# Ignore build outputs for all native modules under src/**
+src/**/build/
+src/**/CMakeFiles/
+src/**/CMakeCache.txt
+src/**/Makefile
+src/**/cmake_install.cmake
+
+# Ignore typical compiled objects/binaries
+src/**/*.o
+src/**/*.obj
+src/**/*.exe
+src/**/*.out
+src/**/*.dll
+src/**/*.pdb
+
+# ----------------------------
+# EXCEPTIONS (keep source files)
+# ----------------------------
+!src/**/CMakeLists.txt
+!src/**/*.cpp
+!src/**/*.h
+!src/**/*.hpp
