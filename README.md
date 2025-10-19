@@ -1,4 +1,5 @@
 # 🌳 CFTree — Get Point Clouds Pipeline
+> Automated retrieval and clipping of AHN LiDAR tiles for digital-twin tree modeling.
 
 This repository contains the **`run_get_pointclouds`** pipeline, which automates the process of **downloading and clipping AHN LiDAR tiles** based on a case-specific area of interest (AOI).  
 It is the first step in the broader **CFTree digital twin workflow** for generating 3D tree models for CFD simulations.
@@ -54,6 +55,24 @@ DEFAULTS = {
 }
 
 ```
+
+## 🧩 Setup
+
+Create and activate the environment (recommended):
+```bash
+conda env create -f environment.yml
+conda activate cftree
+```
+Then verify configuration:
+``` bash
+python -m src.config
+```
+
+This prints all active paths and confirms directories exist.
+
+
+
+
 ## 🚀 How to Run
 
 ### Default run (uses config defaults)
