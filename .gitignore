@@ -1,27 +1,58 @@
-# Ignore everything in cases/
+# =====================================================
+# CFTree Project .gitignore
+# =====================================================
+
+# ----------------------------
+# CASES
+# ----------------------------
+# Ignore all cases by default
 cases/*
 
-# Allow the example case
+# Keep the example case folder itself
 !cases/wippolder/
-!cases/wippolder/**
 
-# Optional: keep a README in the cases folder
+# Keep only the static AOI input for the example case
+!cases/wippolder/city_bbox.geojson
+
+# Optional: keep README or metadata
 !cases/README.md
 
-# Ignore any large or generated data
+# Ignore derived buffered polygons and logs inside cases
+cases/*/city_bbox_buffered.geojson
+cases/*/logs/
+cases/*/*.log
+
+# ----------------------------
+# DATA & RESULTS
+# ----------------------------
 data/
 results/
-logs/
 tmp/
 
-# Python cache and temp files
+# ----------------------------
+# PYTHON BUILD / CACHE
+# ----------------------------
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Environment and IDE stuff
+# ----------------------------
+# ENVIRONMENTS & IDE
+# ----------------------------
 .env
+.venv/
 .vscode/
 .idea/
 .DS_Store
+
+# ----------------------------
+# LOGS & RUNTIME FILES
+# ----------------------------
+*.log
+nohup.out
+
+# ----------------------------
+# LOCAL CONFIG
+# ----------------------------
+cftree_config.yaml
