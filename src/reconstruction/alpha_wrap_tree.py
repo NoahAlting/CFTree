@@ -77,6 +77,7 @@ def alpha_wrap_tree(
         str(roffset),
         str(mesh_ply)
     ]
+
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         logging.debug(f"[GTID {gtid}] Alpha wrap complete -> {mesh_ply.name}")
