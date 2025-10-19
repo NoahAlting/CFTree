@@ -11,12 +11,12 @@ from datetime import datetime, timezone
 # Defaults
 # ---------------------------------------------------------------------
 DEFAULTS = {
-    "case_root": Path("cases"),
-    "data_root": Path("data"),
+    "case_root": Path("cases"),             # user case input directory
+    "data_root": Path("data"),              # data storage root (large files)
     "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
-    "case": "wippolder",
-    "default_cores": 2,  # Global default for parallelization
-    "crs": "EPSG:28992", # Amersfoort / RD New
+    "case": "wippolder",                    # test case
+    "default_cores": 2,                     # Global default for parallelization
+    "crs": "EPSG:28992",                    # Amersfoort / RD New
 }
 
 # ---------------------------------------------------------------------

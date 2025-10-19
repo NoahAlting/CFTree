@@ -43,23 +43,30 @@ def process_tile(tile_dir: Path, cfg: dict, overwrite=False, keep_cache=False) -
     with laspy.open(forest_path) as lf:
         las = lf.read()
     gtid = las.points["gtid"]
-    unique_gtids = np.unique(gtid)
-    logging.info(f"[{tile_id}] Found {len(unique_gtids)} tree IDs (processing max 10).")
+    unique_gtids = np.unique(las["gtid"])
+    take = unique_gtids[:10]  # test limit
 
-    # index for faster selection
-    index_map = {t: np.where(gtid == t)[0] for t in unique_gtids[:10]}
-
-    dtm_path = tile_dir / "clipped_dtm.tif"
-
-    for tree_id, idxs in index_map.items():
-        xyz_path = cache_dir / f"tree_{tree_id}.xyz"
-        np.savetxt(xyz_path, np.c_[las.x[idxs], las.y[idxs], las.z[idxs]], fmt="%.3f")
-
-        # Alpha wrapping
-        res_alpha = alpha_wrap_tree(xyz_path, cache_dir, overwrite=overwrite)
-        if res_alpha["status"] != "ok":
-            logging.warning(f"[{tile_id}] Tree {tree_id}: alpha wrap failed.")
+    for gtid in take:
+        idxs = np.where(las["gtid"] == gtid)[0]
+        if idxs.size == 0:
+            logging.debug(f"[{tile_id}] GTID {gtid}: no points, skip")
             continue
+
+        xyz_path = cache_dir / f"tree_{gtid}.xyz"
+        pts = np.c_[las.x[idxs], las.y[idxs], las.z[idxs]]
+        # optional: skip tiny trees
+        if pts.shape[0] < 50:
+            logging.debug(f"[{tile_id}] GTID {gtid}: {pts.shape[0]} pts < 50, skip")
+            continue
+        np.savetxt(xyz_path, pts, fmt="%.6f")
+
+        res_alpha = alpha_wrap_tree(xyz_path, cache_dir, overwrite=True)  # during dev
+        if res_alpha["status"] != "ok":
+            logging.warning(f"[{tile_id}] GTID {gtid}: alpha wrap failed")
+            continue
+
+    
+        # dtm_path = tile_dir / "clipped_dtm.tif"
 
         # Trunk estimation
         mesh = load_mesh(res_alpha["outputs"]["mesh_ply"])
