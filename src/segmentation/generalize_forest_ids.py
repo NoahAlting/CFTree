@@ -27,18 +27,6 @@ from shapely.geometry import Point
 from src.config import get_config
 import numpy as np
 
-# ---------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------
-def case_prefix_hash(case: str) -> int:
-    """Deterministic 3-digit numeric hash of case name."""
-    return int(hashlib.sha1(case.encode()).hexdigest(), 16) % 1000
-
-
-def compute_gtid(case_prefix: int, counter: int) -> int:
-    """Combine 3-digit prefix with 7-digit sequential counter."""
-    return int(f"{case_prefix:03d}{counter:07d}")
-
 
 # ---------------------------------------------------------------------
 # Main entry point
@@ -69,8 +57,6 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
         return {"case": case, "status": "empty_aoi"}
 
     aoi_geom = aoi.to_crs(cfg["crs"]).geometry.unary_union
-    case_prefix = case_prefix_hash(case)
-    logging.info(f"Case hash prefix: {case_prefix:03d}")
 
     # ------------------------------------------------------------------
     # Collect all tree hulls within AOI
@@ -103,7 +89,7 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
     # ------------------------------------------------------------------
     # Assign GTIDs sequentially
     # ------------------------------------------------------------------
-    hulls["gtid"] = [compute_gtid(case_prefix, i + 1) for i in range(len(hulls))]
+    hulls["gtid"] = np.arange(1, len(hulls) + 1, dtype=np.uint32)
     n_trees = len(hulls)
     logging.info(f"Assigned GTIDs for {n_trees} trees across {len(hulls_all)} tiles.")
 
@@ -240,9 +226,16 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
             las_out.z = merged["z"].values
 
             # Add new extra dimension 'gtid'
+            # if "gtid" not in las_out.point_format.extra_dimension_names:
+            #     las_out.add_extra_dim(laspy.ExtraBytesParams(name="gtid", type=np.int64))
+            # las_out.gtid = merged["gtid"].astype("int64").values
+
+            # Add new extra dimension 'gtid' (uint32 for compatibility)
             if "gtid" not in las_out.point_format.extra_dimension_names:
-                las_out.add_extra_dim(laspy.ExtraBytesParams(name="gtid", type=np.int64))
-            las_out.gtid = merged["gtid"].astype("int64").values
+                las_out.add_extra_dim(laspy.ExtraBytesParams(name="gtid", type=np.uint32))
+            las_out["gtid"] = merged["gtid"].astype(np.uint32).values
+
+
 
             las_out.write(out_forest)
             logging.info(f"[{tile_dir.name}] Wrote forest.laz ({len(las_out.points)} points)")
