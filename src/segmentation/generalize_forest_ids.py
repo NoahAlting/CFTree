@@ -68,7 +68,7 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
         logging.error(f"AOI file is empty: {aoi_path}")
         return {"case": case, "status": "empty_aoi"}
 
-    aoi_geom = aoi.to_crs(28992).geometry.unary_union
+    aoi_geom = aoi.to_crs(cfg["crs"]).geometry.unary_union
     case_prefix = case_prefix_hash(case)
     logging.info(f"Case hash prefix: {case_prefix:03d}")
 
@@ -83,7 +83,7 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
         if not hull_path.exists():
             continue
         try:
-            gdf = gpd.read_file(hull_path).to_crs(28992)
+            gdf = gpd.read_file(hull_path).to_crs(cfg["crs"])
             gdf["tile_id"] = tile_dir.name
             gdf["centroid"] = gdf.geometry.centroid
             gdf = gdf[gdf["centroid"].within(aoi_geom)]
@@ -98,7 +98,7 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
 
     hulls = pd.concat(hulls_all, ignore_index=True)
     hulls = hulls.drop(columns="centroid")
-    hulls = gpd.GeoDataFrame(hulls, crs="EPSG:28992")
+    hulls = gpd.GeoDataFrame(hulls, crs=cfg["crs"])
 
     # ------------------------------------------------------------------
     # Assign GTIDs sequentially

@@ -21,6 +21,8 @@ import pandas as pd
 import geopandas as gpd
 from shapely.geometry import MultiPoint
 
+from src.config import get_config
+
 
 # ---------------------------------------------------------------------
 # Configuration
@@ -31,6 +33,7 @@ SEG_PARAMS = {
     "vres": 1.5,
     "min_pts": 3,
 }
+cfg = get_config()
 
 
 # ---------------------------------------------------------------------
@@ -90,7 +93,7 @@ def segment_tile(tile_dir: Path, overwrite: bool = False) -> dict:
     # ------------------------------------------------------------------
     try:
         seg_df = pd.read_csv(output_xyz, sep=r"\s+", header=None, names=["tid", "x", "y", "z"])
-        seg_gdf = gpd.GeoDataFrame(seg_df, geometry=gpd.points_from_xy(seg_df.x, seg_df.y), crs="EPSG:28992")
+        seg_gdf = gpd.GeoDataFrame(seg_df, geometry=gpd.points_from_xy(seg_df.x, seg_df.y), crs=cfg["crs"])
 
         hulls = []
         for tid, group in seg_gdf.groupby("tid"):
@@ -101,7 +104,7 @@ def segment_tile(tile_dir: Path, overwrite: bool = False) -> dict:
                 logging.debug(f"[{tile_id}] Tree ID {tid} has <3 points — skipped.")
 
         if hulls:
-            hulls_gdf = gpd.GeoDataFrame(hulls, crs="EPSG:28992")
+            hulls_gdf = gpd.GeoDataFrame(hulls, crs=cfg["crs"])
             hulls_gdf.to_file(hulls_geojson, driver="GeoJSON")
         else:
             logging.warning(f"[{tile_id}] No valid hulls produced.")

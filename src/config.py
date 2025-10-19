@@ -16,6 +16,7 @@ DEFAULTS = {
     "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
     "case": "wippolder",
     "default_cores": 2,  # Global default for parallelization
+    "crs": "EPSG:28992", # Amersfoort / RD New
 }
 
 # ---------------------------------------------------------------------
@@ -75,7 +76,8 @@ def get_config() -> dict:
         "data_root": Path(cfg["data_root"]).expanduser().resolve(),
         "resources_dir": Path(cfg["resources_dir"]).expanduser().resolve(),
         "case": case_name,
-        "default_cores": int(cfg.get("default_cores", 2)),
+        "default_cores": int(cfg.get("default_cores", 1)),
+        "crs": cfg["crs"],
     }
 
     # Derived paths

@@ -70,7 +70,8 @@ def main():
     # Step 1: Load and buffer AOI
     # ------------------------------------------------------------------
     logging.info(f"Loading AOI from {aoi_path}")
-    aoi = gpd.read_file(aoi_path).to_crs("EPSG:28992")
+    logging.info(f"CRS: {cfg['crs']}")
+    aoi = gpd.read_file(aoi_path).to_crs(cfg["crs"])
     aoi["geometry"] = aoi.buffer(args.buffer)
     aoi.to_file(buffered_aoi_path, driver="GeoJSON")
     logging.info(f"Buffered AOI saved to {buffered_aoi_path}")
@@ -78,7 +79,7 @@ def main():
     # ------------------------------------------------------------------
     # Step 2: Determine intersecting tiles
     # ------------------------------------------------------------------
-    tiles = gpd.read_file(resources_dir / "AHN_subunits_GeoTiles.shp").to_crs("EPSG:28992")
+    tiles = gpd.read_file(resources_dir / "AHN_subunits_GeoTiles.shp").to_crs(cfg["crs"])
     intersecting = tiles[tiles.intersects(aoi.union_all())]
     tile_ids = intersecting["GT_AHNSUB"].unique().tolist()
 
