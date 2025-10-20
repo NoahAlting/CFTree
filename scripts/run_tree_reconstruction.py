@@ -19,22 +19,17 @@ from scipy.spatial import cKDTree
 import trimesh
 import gc
 import os
-
+import json
 
 from src.config import get_config, setup_logger
 from src.reconstruction.alpha_wrap_tree import alpha_wrap_tree
 from src.reconstruction.extract_tree_metrics import compute_tree_metrics
-# later: from src.reconstruction.construct_geometry import construct_geometry
-# later: from src.reconstruction.write_cityjson_tile import write_cityjson_tile
-
-# Suppress verbose logs from dependencies
-logging.getLogger("fiona").setLevel(logging.WARNING)
-logging.getLogger("trimesh").setLevel(logging.WARNING)
-logging.getLogger("rasterio").setLevel(logging.WARNING)
+from src.reconstruction.construct_geometry import construct_lod3
+from src.reconstruction.write_cityjson import init_cityjson, add_tree, finalize_cityjson
 
 
 # ---------------------------------------------------------------------
-# helper: warm up to speed up first calls
+# Warmup for libraries (helps avoid startup lag)
 # ---------------------------------------------------------------------
 def warmup_once():
     """Warm up cKDTree, Trimesh ray 'contains', and voxel engine (single core)."""
@@ -51,18 +46,20 @@ def warmup_once():
     logging.info(f"[init] embree available: {trimesh.ray.has_embree}")
 
 
-
 # ---------------------------------------------------------------------
 # Tile worker
 # ---------------------------------------------------------------------
-def process_tile(tile_dir: Path, cfg: dict, overwrite: bool = False, keep_cache: bool = False) -> dict:
+def process_tile(
+    tile_dir: Path,
+    cfg: dict,
+    overwrite: bool = False,
+    keep_cache: bool = False,
+    max_trees: int | None = None,
+) -> dict:
     """
-    Process a single tile: run alpha wrapping, tree metric extraction, and prepare data
-    for geometry construction and CityJSON export.
+    Process a single tile: run alpha wrapping, tree metric extraction,
+    geometry construction, and CityJSON export.
     """
-    # ------------------------------------------------------------------
-    # Thread control & warmup
-    # ------------------------------------------------------------------
     os.environ.update({
         "OMP_NUM_THREADS": "1",
         "OPENBLAS_NUM_THREADS": "1",
@@ -74,9 +71,6 @@ def process_tile(tile_dir: Path, cfg: dict, overwrite: bool = False, keep_cache:
         warmup_once()
         process_tile._warmed_up = True
 
-    # ------------------------------------------------------------------
-    # Tile setup
-    # ------------------------------------------------------------------
     tile_id = tile_dir.name
     logging.info(f"[{tile_id}] Starting reconstruction")
 
@@ -87,18 +81,17 @@ def process_tile(tile_dir: Path, cfg: dict, overwrite: bool = False, keep_cache:
 
     forest_path = tile_dir / "forest.laz"
     dtm_path = tile_dir / "clipped_dtm.tif"
+    cityjson_path = tile_dir / "trees_lod3.city.json"
 
-    if not forest_path.exists():
-        logging.warning(f"[{tile_id}] Missing forest.laz — skipping")
+    if not forest_path.exists() or not dtm_path.exists():
+        logging.warning(f"[{tile_id}] Missing inputs — skipping tile")
         return {"tile_id": tile_id, "status": "missing_input"}
 
-    if not dtm_path.exists():
-        logging.warning(f"[{tile_id}] Missing DTM — skipping")
-        return {"tile_id": tile_id, "status": "missing_input"}
+    if cityjson_path.exists() and not overwrite:
+        logging.info(f"[{tile_id}] CityJSON already exists — skipping")
+        return {"tile_id": tile_id, "status": "exists"}
 
-    # ------------------------------------------------------------------
-    # Load forest points
-    # ------------------------------------------------------------------
+    # Load point cloud
     with laspy.open(forest_path) as lf:
         las = lf.read()
 
@@ -111,34 +104,33 @@ def process_tile(tile_dir: Path, cfg: dict, overwrite: bool = False, keep_cache:
         logging.warning(f"[{tile_id}] No GTIDs found — skipping tile")
         return {"tile_id": tile_id, "status": "empty_tile"}
 
-    # For development/testing, limit number of trees processed
-    unique_gtids = unique_gtids[:10]
+    city = init_cityjson()
+    processed = 0
 
-    tile_trees = []
 
-    # ------------------------------------------------------------------
-    # Tree loop
-    # ------------------------------------------------------------------
-    for gtid in unique_gtids:
+    # test offset iteration
+    test_offset_iteration = 300 # remove before publication
+    if max_trees: # limit number of trees for testing
+        unique_gtids = unique_gtids[test_offset_iteration:test_offset_iteration+max_trees]
+
+    for gtid in unique_gtids:                      
         logging.debug("="*40 + f"[{tile_id}] Processing GTID {gtid}")
-
 
         idxs = np.where(las["gtid"] == gtid)[0]
         if idxs.size < 50:
             logging.debug(f"[{tile_id}] GTID {gtid}: {idxs.size} pts < 50, skip")
             continue
 
-        # Extract and localize point cloud
+        # Extract & localize
         pts = np.c_[las.x[idxs], las.y[idxs], las.z[idxs]]
         offset = pts.mean(axis=0)
         local_pts = pts - offset
-        logging.info(f"[{tile_id}] GTID {gtid}: translating to local coordinates (offset={offset})")
+        logging.info(f"[{tile_id}] GTID {gtid}: localize point cloud (offset={offset})")
 
-        # Save temporary XYZ file for alpha wrapping
         xyz_path = cache_dir / f"tree_{gtid}.xyz"
         np.savetxt(xyz_path, local_pts, fmt="%.6f")
 
-        # Alpha wrapping in local space
+        # Alpha wrap
         res_alpha = alpha_wrap_tree(xyz_path, cache_dir, overwrite=True)
         if res_alpha["status"] != "ok":
             logging.warning(f"[{tile_id}] GTID {gtid}: alpha wrap failed")
@@ -147,44 +139,40 @@ def process_tile(tile_dir: Path, cfg: dict, overwrite: bool = False, keep_cache:
         mesh_path = res_alpha["outputs"]["mesh_ply"]
         mesh = load_mesh(mesh_path)
 
-        # Compute metrics (local→global handled internally)
+        # Metrics
         logging.info(f"[{tile_id}] GTID {gtid}: computing metrics")
         metrics = compute_tree_metrics(mesh, local_pts, dtm_path, offset)
         if metrics["status"] != "ok":
             logging.warning(f"[{tile_id}] GTID {gtid}: metric computation failed")
+            del mesh, local_pts
             continue
 
-        # Free memory immediately after use
-        del local_pts, pts, mesh, res_alpha
+        # Construct geometry (LoD3 only for now)
+        tree_geom = construct_lod3(mesh, metrics, offset, gtid=int(gtid), tile_id=tile_id)
+
+        # Add to CityJSON
+        add_tree(city, int(gtid), tree_geom["components"], offset, tree_geom["attributes"])
+
+        processed += 1
+
+        # Free memory
+        del mesh, local_pts, res_alpha, tree_geom
         gc.collect()
 
-        # Compact log summary
-        c = metrics["crown"]
-        t = metrics["trunk"]
-        logging.info(
-            f"[{tile_id}] Tree {gtid}: "
-            f"TRUNK(H={t['H_m']:.2f} m, DBH={t['DBH_m']:.3f} m, r={t['r_trunk']:.3f} m) | "
-            f"CROWN(CW={c['CW_m']:.3f} m, r50={c['r50_m']:.3f} m, porosity={c['porosity']:.3f})"
-        )
-
-        tile_trees.append({
-            "gtid": int(gtid),
-            "offset": offset.tolist(),
-            "metrics": metrics,
-            "mesh_path": str(mesh_path)
-        })
-
-    # ------------------------------------------------------------------
-    # Post-processing
-    # ------------------------------------------------------------------
-    # TODO: construct_geometry(tile_trees)
-    # TODO: write_cityjson_tile(tile_dir, tile_trees)
+    # Finalize CityJSON
+    if processed > 0:
+        city_final = finalize_cityjson(city)
+        with open(cityjson_path, "w", encoding="utf-8") as f:
+            json.dump(city_final, f, indent=2)
+        logging.info(f"[{tile_id}] CityJSON written: {cityjson_path.name} ({processed} trees)")
+    else:
+        logging.warning(f"[{tile_id}] No trees processed — skipping CityJSON write.")
 
     if not keep_cache:
         shutil.rmtree(cache_dir, ignore_errors=True)
 
-    logging.info(f"[{tile_id}] Reconstruction complete ({len(tile_trees)} trees)")
-    return {"tile_id": tile_id, "n_trees": len(tile_trees), "status": "ok"}
+    logging.info(f"[{tile_id}] Reconstruction complete ({processed} trees)")
+    return {"tile_id": tile_id, "n_trees": processed, "status": "ok"}
 
 
 # ---------------------------------------------------------------------
@@ -192,12 +180,13 @@ def process_tile(tile_dir: Path, cfg: dict, overwrite: bool = False, keep_cache:
 # ---------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser(description="Run 3D tree reconstruction (Step 3)")
-    parser.add_argument("--case", help="Case name (default from config if omitted)")
-    parser.add_argument("--n-cores", type=int, help="Number of parallel cores (default from config)")
+    parser.add_argument("--case", type=str, help="Case name (default from config if omitted)")
+    parser.add_argument("--n-cores", type=int, help="Number of parallel cores (default from config if omitted)")
     parser.add_argument("--log-level", default="INFO")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--keep-cache", action="store_true")
+    parser.add_argument("--max-trees", type=int, default=10, help="Limit number of trees per tile (for testing)")
     args = parser.parse_args()
 
     cfg = get_config()
@@ -206,7 +195,6 @@ def main():
 
     setup_logger(case, "tree_reconstruction", level=args.log_level)
 
-    # Suppress noisy logs
     for noisy in ["trimesh", "rasterio", "fiona", "shapely"]:
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
@@ -222,10 +210,12 @@ def main():
         logging.info(f"Dry run — found {len(tile_dirs)} tiles")
         return
 
-    # Parallel execution
     results = []
     with ProcessPoolExecutor(max_workers=n_cores) as ex:
-        futs = {ex.submit(process_tile, t, cfg, args.overwrite, args.keep_cache): t for t in tile_dirs}
+        futs = {
+            ex.submit(process_tile, t, cfg, args.overwrite, args.keep_cache, args.max_trees): t
+            for t in tile_dirs
+        }
         for fut in as_completed(futs):
             res = fut.result()
             results.append(res)
