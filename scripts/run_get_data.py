@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-scripts/run_get_pointclouds.py
+scripts/run_get_data.py
 
 Full pipeline for downloading and clipping AHN geotiles for a case.
 
 Example:
-    nohup python -m scripts.run_get_pointclouds --n-cores 2 --case wippolder &
+    nohup python -m scripts.run_get_data --n-cores 2 --case wippolder &
 """
 
 import logging
@@ -15,25 +15,69 @@ import geopandas as gpd
 from pathlib import Path
 
 from src.config import get_config, setup_logger
-from src.get_pointclouds.download_geotiles import download_tile
-from src.get_pointclouds.clip_tile import clip_tile
+from src.get_data.download_geotiles import download_tile
+from src.get_data.clip_tile import clip_tile
+from src.get_data.extract_dtm import compute_tile_dtm
 
 
 # ---------------------------------------------------------------------
 # Tile worker (must be top-level for multiprocessing)
 # ---------------------------------------------------------------------
 def process_tile(tile_id: str, output_dir: Path, base_url: str, overwrite: bool, aoi_path: Path) -> dict:
-    """Download and immediately clip one tile."""
+    """Download, clip, and compute DTM for one tile."""
     try:
+        # ---------------------------
+        # 1. Download raw tile
+        # ---------------------------
         result_dl = download_tile(tile_id, output_dir, base_url, overwrite)
         laz_path = result_dl.get("paths", {}).get("laz")
 
         if result_dl["status"] != "ok" or not laz_path or not Path(laz_path).exists():
             return {"tile_id": tile_id, "status": "download_failed"}
 
+        # ---------------------------
+        # 2. Clip tile to AOI
+        # ---------------------------
         result_clip = clip_tile(Path(laz_path), aoi_path)
-        return {"tile_id": tile_id, "status": result_clip["status"]}
+        if result_clip["status"] != "ok":
+            return {"tile_id": tile_id, "status": result_clip["status"]}
+
+        clipped_path = result_clip.get("paths", {}).get("clipped")
+        if not clipped_path or not Path(clipped_path).exists():
+            logging.warning(f"[{tile_id}] Clipped tile missing — skipping DTM generation.")
+            return {"tile_id": tile_id, "status": "clip_failed"}
+
+        # ---------------------------
+        # 3. Compute DTM
+        # ---------------------------
+        dtm_path = Path(clipped_path).with_name("clipped_dtm.tif")
+        if not dtm_path.exists() or overwrite:
+            try:
+                logging.info(f"[{tile_id}] Computing DTM from clipped tile...")
+                compute_tile_dtm(Path(clipped_path), dtm_path, ground_only=True)
+                status = "ok"
+            except Exception as e:
+                logging.warning(f"[{tile_id}] DTM generation failed: {e}")
+                status = "dtm_failed"
+        else:
+            logging.debug(f"[{tile_id}] DTM already exists — skipped.")
+            status = "ok"
+
+        # ---------------------------
+        # 4. Return tile summary
+        # ---------------------------
+        return {
+            "tile_id": tile_id,
+            "status": status,
+            "paths": {
+                "raw": str(laz_path),
+                "clipped": str(clipped_path),
+                "dtm": str(dtm_path),
+            },
+        }
+
     except Exception as e:
+        logging.exception(f"[{tile_id}] Unexpected error: {e}")
         return {"tile_id": tile_id, "status": f"error: {e}"}
 
 
@@ -41,7 +85,7 @@ def process_tile(tile_id: str, output_dir: Path, base_url: str, overwrite: bool,
 # Runner main
 # ---------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description="Run get_pointclouds pipeline for a case.")
+    parser = argparse.ArgumentParser(description="Run get_data pipeline for a case.")
     parser.add_argument("--case", type=str, help="Case name (default from config)")
     parser.add_argument("--n-cores", type=int, default=None, help="Number of parallel workers (default from config)")
     parser.add_argument("--overwrite", action="store_true", help="Re-download tiles if they exist")
@@ -53,11 +97,11 @@ def main():
     # Load configuration
     cfg = get_config()
     case = args.case or cfg["case"]
-    setup_logger(case, "get_pointclouds", args.log_level)
+    setup_logger(case, "get_data", args.log_level)
 
     # Resolve number of cores
     n_cores = args.n_cores or cfg["default_cores"]
-    logging.info(f"Starting get_pointclouds for case: {case}")
+    logging.info(f"Starting get_data for case: {case}")
     logging.info(f"Parallel workers: {n_cores} (from {'CLI' if args.n_cores else 'config'})")
     logging.info(f"Buffer distance: {args.buffer} m")
 
@@ -118,7 +162,7 @@ def main():
             result = process_tile(tid, output_dir, base_url, args.overwrite, buffered_aoi_path)
             logging.info(f"[{tid}] {result['status'].upper()}")
 
-    logging.info(f"Completed get_pointclouds for case: {case}")
+    logging.info(f"Completed get_data for case: {case}")
 
 
 # ---------------------------------------------------------------------

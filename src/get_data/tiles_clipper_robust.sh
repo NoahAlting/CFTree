@@ -3,10 +3,10 @@
 # Clip a single LAZ file using PDAL crop filter.
 #
 # Usage:
-#   bash src/get_pointclouds/tiles_clipper_robust.sh <input_laz> <aoi_geojson> <output_laz>
+#   bash src/get_data/tiles_clipper_robust.sh <input_laz> <aoi_geojson> <output_laz>
 #
 # Example:
-#   bash src/get_pointclouds/tiles_clipper_robust.sh \
+#   bash src/get_data/tiles_clipper_robust.sh \
 #       data/wippolder/tiles/37EN2_11/raw.laz \
 #       cases/wippolder/city_bbox_buffered.geojson \
 #       data/wippolder/tiles/37EN2_11/clipped.laz
