@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 # ---------------------------------------------------------------------
 # Default case configurations
 # ---------------------------------------------------------------------
-CASE_CONFIGURATIONS = {
+DEFAULT_CONFIG = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
     "resources_dir": Path("resources"),
@@ -31,7 +31,7 @@ def setup_logger(case: str, logfile_name: str, level: str = "INFO") -> Path:
     - Uses UTC ISO-8601 timestamps.
     - Adds a NEW SESSION banner at start.
     """
-    case_root = CASE_CONFIGURATIONS["case_root"]
+    case_root = DEFAULT_CONFIG["case_root"]
     case_path = case_root / case
     log_dir = case_path / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -76,7 +76,7 @@ def get_config(case_name: str | None = None, n_cores: int | None = None) -> dict
 
     If not provided, defaults to 'wippolder' and 2 cores.
     """
-    cfg = CASE_CONFIGURATIONS.copy()
+    cfg = DEFAULT_CONFIG.copy()
 
     # Override defaults if arguments are provided
     case_name = case_name or cfg["case"]

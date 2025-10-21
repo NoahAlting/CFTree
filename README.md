@@ -82,14 +82,14 @@ cases/<case_name>/case_area.geojson
 ### 2. Set case variables in `src/config.py`, defaults for example run are:
 ``` python
 # ---------------------------------------------------------------------
-# Case configurations used throughout the pipeline
+# Default case configurations
 # ---------------------------------------------------------------------
-CASE_CONFIGURATIONS = {
+DEFAULT_CONFIG = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
     "resources_dir": Path("resources"),
-    "case": "wippolder",                    # test case
-    "default_cores": 2,                     # Global default for parallelization
+    "case": "wippolder",                    # default case
+    "default_cores": 2,                     # global default for parallelization
     "crs": "EPSG:28992",                    # Amersfoort / RD New
 }
 ```
