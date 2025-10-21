@@ -86,7 +86,7 @@ cases/<case_name>/case_area.geojson
 CASE_CONFIGURATIONS = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
-    "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
+    "resources_dir": Path("resources"),
     "case": "wippolder",                    # test case
     "default_cores": 2,                     # Global default for parallelization
     "crs": "EPSG:28992",                    # Amersfoort / RD New
@@ -96,7 +96,7 @@ CASE_CONFIGURATIONS = {
 ### 3. Build the cpp files.
 Detailed instructions see `src/segmentation/TreeSeparation/README.md` and `src/reconstruction/AlphaWrap/README.md`.
 
-### 4. Run the full pipeline:
+### 4. Run pipeline steps individually:
 ``` bash
 python -m scripts.get_data
 python -m scripts.segmentation
@@ -110,12 +110,33 @@ If desired, each stage can be overwritten:
 --overwrite                         # overwrite existing files
 --dry-run                           # only list tiles
 ```
-Logs for each run are stored under:
-``` bash
-cases/<case_name>/logs/
+Logs for each run are stored under: `cases/<case_name>/logs/`
+
+
+### 5. (New) Run the entire pipeline with a single command
+
+A new `main.py` script orchestrates all three stages — data acquisition, segmentation, and reconstruction — in sequence.  
+It automatically loads configuration values from `src/config.py` and logs high-level progress to `cases/<case_name>/logs/main.log`.
+
+```bash
+python main.py --case wippolder --overwrite --n-cores 16
 ```
 
-## Outputs
+Optional arguments (same as for individual stages):
+
+``` bash
+--case <case_name>                 # case to process (default from config)
+--n-cores <number>                 # number of CPU cores (default from config)
+--overwrite                        # re-run even if outputs exist
+--log-level <INFO|DEBUG|WARNING>   # logging verbosity
+--dry-run                          # only list tiles to process
+--buffer <distance>                # buffer distance around AOI (default 20 m)
+--max-trees <number>               # limit number of trees per tile (for testing)
+```
+
+Logs summary and timing for each stage are written to `cases/<case_name>/logs/main.log`.
+
+## 6 Outputs
 Each fully processed tile will contain:
 ``` bash
 clipped.laz
@@ -133,7 +154,7 @@ data/<case_name>/forest_hulls.geojson
 data/<case_name>/gtid_map.csv
 ```
 
-## Performance
+## 7 Performance
 | City      | # Trees | Runtime (16 cores) | Notes                       |
 | --------- | ------- | ------------------ | --------------------------- |
 | Amsterdam | ~380k   | ~13 h              | Full pipeline, AHN5 dataset |
@@ -142,7 +163,7 @@ data/<case_name>/gtid_map.csv
 | Delft     | ~90k    | ~3 h               |                             |
 
 
-## Acknoledgements
+## 8 Acknoledgements
 This repository is part of my MSc thesis:
 “From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.”
 at the Delft University of Technology, Faculty of Architecture and the Built Environment.
@@ -150,5 +171,5 @@ Available soon at: https://repository.tudelft.nl/
 
 Supervised by: Dr. Hugo Ledoux and Dr. Clara García Sánchez
 
-## license
+## 9 license
 ???
