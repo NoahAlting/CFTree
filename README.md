@@ -1,8 +1,9 @@
 # From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction
 
-This repository contains the code accompanying the MSc thesis **"From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction"**  
+This repository contains the code accompanying the MSc thesis:
+**From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction**  
 by **Noah Petri Alting**, MSc Geomatics, **TU Delft (2025)**.  
-The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries directly from open-access airborne LiDAR data (AHN).  
+The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries at the city scale, directly from open-access airborne lidar data [**AHN**](https://www.ahn.nl/).  
 
 ---
 
@@ -11,7 +12,7 @@ The project presents a fully automated, scalable pipeline that reconstructs CFD-
 Urban climate simulations increasingly rely on digital twins of cities, yet vegetation remains largely absent or oversimplified despite its strong influence on wind flow and heat exchange.  
 This project introduces a complete end-to-end workflow that reconstructs detailed, watertight, and physically meaningful tree models from raw airborne laser scanning (ALS) point clouds.  
 
-The pipeline operates directly on unstructured LiDAR data and consists of three major components:
+The pipeline operates directly on unstructured lidar data and consists of three major components:
 
 1. **Data acquisition** — Automatic download, clipping, and preprocessing of AHN tiles for a user-defined area.  
 2. **Segmentation** — Novel *High-Order Multi-Echo Density (HOMED)* vegetation filtering and per-tree clustering via a modified *TreeSeparation* algorithm.  
@@ -58,7 +59,6 @@ cftree/
   - Derives morphological attributes (e.g., crown width, height, trunk dimensions).
   - Constructs LOD3-level crown and trunk geometries.
 - Exports per-tile CityJSON files with full geometric and attribute information.
-
 
 ---
 
