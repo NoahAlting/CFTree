@@ -68,9 +68,10 @@ This repository uses a Conda environment for reproducibility.
 conda env create -f environment.yml
 conda activate cftree
 ```
-Ensure sufficient storage capacity (≥100 GB recommended for full-city processing).
-The data path can be configured in `src/config.py`.
 
+> **NOTE:** Ensure sufficient storage capacity (≥100 GB recommended for full-city processing). The data path can be configured in `src/config.py`.
+
+> **NOTE:** Creating the environment may take a while, don't worry!
 
 ## Quickstart example
 

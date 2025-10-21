@@ -77,8 +77,9 @@ def main():
     # Load configuration
     # -------------------------------
     cfg = get_config()
-    case = args.case or cfg["case"]
-    n_cores = args.n_cores or cfg["default_cores"]
+    
+    case = args.case if args.case is not None else cfg["case"]
+    n_cores = args.n_cores if args.n_cores is not None else cfg["default_cores"]
 
     # -------------------------------
     # Setup main logger
