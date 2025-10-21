@@ -48,13 +48,13 @@ cftree/
 
 ### 2. Tree Segmentation (`segmentation`)
 - Applies the **HOMED** vegetation filter to isolate vegetation points.
-- Segments individual trees using a modified **TreeSeparation** algorithm (C++).
+- Segments individual trees using a modified **TreeSeparation** algorithm (C++). github.com/Jinhu-Wang/TreeSeparation
 - Produces per-tree point clusters and a harmonized forest-level point cloud (`forest.laz`) with global tree identifiers (`gtid`).
 
 ### 3. Geometry Reconstruction (`reconstruction`)
 - For each segmented tree:
   - Generates local coordinate systems for efficiency.
-  - Reconstructs watertight meshes using the **CGAL 3D Alpha Wrapping** algorithm.
+  - Reconstructs watertight meshes using the **CGAL 3D Alpha Wrapping** algorithm. doc.cgal.org/latest/Alpha_wrap_3/index.html#Chapter_3D_Alpha_wrapping
   - Derives morphological attributes (e.g., crown width, height, trunk dimensions).
   - Constructs LOD3-level crown and trunk geometries.
 - Exports per-tile CityJSON files with full geometric and attribute information.
@@ -72,7 +72,10 @@ conda activate cftree
 Ensure sufficient storage capacity (≥100 GB recommended for full-city processing).
 The data path can be configured in src/config.py.
 
+---
+
 ## Quickstart example
+
 1. Define your area of interest in:
 ```bash 
 cases/<case_name>/city_bbox.geojson
@@ -108,6 +111,8 @@ Logs for each run are stored under:
 cases/<case_name>/logs/
 ```
 
+---
+
 ## Outputs
 Each fully processed tile will contain:
 ``` bash
@@ -126,6 +131,8 @@ data/<case_name>/forest_hulls.geojson
 data/<case_name>/gtid_map.csv
 ```
 
+---
+
 ## Performance
 | City      | # Trees | Runtime (16 cores) | Notes                       |
 | --------- | ------- | ------------------ | --------------------------- |
@@ -134,11 +141,15 @@ data/<case_name>/gtid_map.csv
 | Utrecht   | ~150k   | ~5 h               |                             |
 | Delft     | ~90k    | ~3 h               |                             |
 
+---
+
 ## Thesis Reference
 This repository accompanies the MSc thesis:
 Noah Petri Alting (2025). “From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.”
 Delft University of Technology, Faculty of Architecture and the Built Environment.
 Available soon at: https://repository.tudelft.nl/
+
+---
 
 ## license
 ???
