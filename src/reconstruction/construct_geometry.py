@@ -179,7 +179,7 @@ def construct_lod3(
         {"components": [ ... ], "attributes": OrderedDict([...])}
     """
     gtid_str = f"GTID {gtid}" if gtid is not None else "GTID ?"
-    logging.debug(f"[{gtid_str}] Constructing LoD3 geometry...")
+    logging.debug(f"[{tile_id}] [{gtid_str}] Constructing LoD3 geometry...")
 
     components = []
 
@@ -188,7 +188,7 @@ def construct_lod3(
     if crown_comp is not None:
         components.append(crown_comp)
     else:
-        logging.warning(f"[{gtid_str}] No valid crown component created.")
+        logging.warning(f"[{tile_id}] [{gtid_str}] No valid crown component created.")
 
     # --- Trunk Solid ---
     trunk_base = None
@@ -214,7 +214,7 @@ def construct_lod3(
     if trunk_comp is not None:
         components.append(trunk_comp)
     else:
-        logging.debug(f"[{gtid_str}] No valid trunk component created.")
+        logging.warning(f"[{tile_id}] [{gtid_str}] No valid trunk component created.")
 
     # --- Sanity check: local coordinates shouldn't exceed ~5 000 m magnitude ---
     for comp in components:
