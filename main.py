@@ -125,13 +125,16 @@ def main():
     logger.info("\n" + "=" * 60 + "Starting full CFTree pipeline")
     logger.info("=" * 20 + " Stage 1: Data Acquisition")
     logger.info(f"buffer distance: {args.buffer} m")
+    logger.info(f'running...\t ETA = ~ {len(tile_ids) / n_cores * 1.2} minutes (assuming ~1.2 min per tile)')
     run_stage("get_data", cmd_get_data)
 
     logger.info("=" * 20 + " Stage 2: Segmentation")
+    logger.info(f'running...\t ETA = ~ {len(tile_ids) / n_cores * 0.0} minutes (assuming ~0.0 min per tile)')
     run_stage("segmentation", cmd_segmentation)
 
     logger.info("=" * 20 + " Stage 3: Reconstruction")
     logger.info(f"max trees per tile: {args.max_trees if args.max_trees is not None else 'unlimited'}")
+    logger.info(f'running...\t ETA = ~ {len(tile_ids) / n_cores * 0.0} minutes (assuming ~0.0 min per tile)')
     run_stage("reconstruction", cmd_reconstruction)
 
     total_time = (time.time() - start) / 60
