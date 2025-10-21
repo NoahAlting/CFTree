@@ -49,8 +49,8 @@ dependencies:
   - cgal
 
   # --- Pip packages ---
-  - pip
-  - pip:
+  # - pip
+  # - pip:
       # - cityjson
-      - pycityjson
-      - pdal-plugins
+      # - pycityjson
+      # - pdal-plugins
