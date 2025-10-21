@@ -8,14 +8,14 @@ import logging
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------------
-# Case configurations used throughout the pipeline
+# Default case configurations
 # ---------------------------------------------------------------------
 CASE_CONFIGURATIONS = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
     "resources_dir": Path("resources"),
-    "case": "wippolder",                    # test case
-    "default_cores": 2,                     # Global default for parallelization
+    "case": "wippolder",                    # default case
+    "default_cores": 2,                     # global default for parallelization
     "crs": "EPSG:28992",                    # Amersfoort / RD New
 }
 
@@ -54,7 +54,7 @@ def setup_logger(case: str, logfile_name: str, level: str = "INFO") -> Path:
     # UTC timestamps
     logging.Formatter.converter = lambda *args: datetime.now(timezone.utc).timetuple()
 
-    banner = "\n" + "="*40 + f" NEW SESSION {datetime.now(timezone.utc).isoformat()}Z" + "="*40 
+    banner = "\n" + "="*40 + f" NEW SESSION {datetime.now(timezone.utc).isoformat()}Z" + "="*40
     logging.info(banner)
     logging.info(f"Logging to: {log_path}")
     return log_path
@@ -63,20 +63,31 @@ def setup_logger(case: str, logfile_name: str, level: str = "INFO") -> Path:
 # ---------------------------------------------------------------------
 # Config management
 # ---------------------------------------------------------------------
-def get_config() -> dict:
+def get_config(case_name: str | None = None, n_cores: int | None = None) -> dict:
     """
     Return resolved configuration with canonical paths and compute settings.
+
+    Parameters
+    ----------
+    case_name : str, optional
+        Case name to override default.
+    n_cores : int, optional
+        Number of cores to override default.
+
+    If not provided, defaults to 'wippolder' and 2 cores.
     """
     cfg = CASE_CONFIGURATIONS.copy()
 
-    case_name = cfg["case"]
+    # Override defaults if arguments are provided
+    case_name = case_name or cfg["case"]
+    n_cores = n_cores or cfg["default_cores"]
 
     resolved = {
         "case_root": Path(cfg["case_root"]).expanduser().resolve(),
         "data_root": Path(cfg["data_root"]).expanduser().resolve(),
         "resources_dir": Path(cfg["resources_dir"]).expanduser().resolve(),
         "case": case_name,
-        "default_cores": int(cfg.get("default_cores", 1)),
+        "default_cores": int(n_cores),
         "crs": cfg["crs"],
     }
 

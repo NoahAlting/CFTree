@@ -59,16 +59,16 @@ def main():
     args = parser.parse_args()
 
     # Load configuration
-    cfg = get_config()
-    case = args.case or cfg["case"]
+    cfg = get_config(case_name=args.case, n_cores=args.n_cores)
+    case = cfg["case"]
+    n_cores = cfg["default_cores"]
+
     setup_logger(case, "tree_segmentation", args.log_level)
 
     logging.info("=" * 80)
     logging.info(f"Starting tree segmentation pipeline for case: {case}")
     logging.info("=" * 80)
 
-    # Resolve number of cores
-    n_cores = args.n_cores or cfg["default_cores"]
     logging.info(f"Parallel workers: {n_cores}")
     logging.info(f"Overwrite: {args.overwrite}")
 

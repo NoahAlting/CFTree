@@ -95,12 +95,12 @@ def main():
     args = parser.parse_args()
 
     # Load configuration
-    cfg = get_config()
-    case = args.case or cfg["case"]
+    cfg = get_config(case_name=args.case, n_cores=args.n_cores)
+    case = cfg["case"]
+    n_cores = cfg["default_cores"]
+
     setup_logger(case, "get_data", args.log_level)
 
-    # Resolve number of cores
-    n_cores = args.n_cores or cfg["default_cores"]
     logging.info(f"Starting get_data for case: {case}")
     logging.info(f"Parallel workers: {n_cores} (from {'CLI' if args.n_cores else 'config'})")
     logging.info(f"Buffer distance: {args.buffer} m")

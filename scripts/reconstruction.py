@@ -193,9 +193,10 @@ def main():
     parser.add_argument("--max-trees", type=int, default=None, help="Limit number of trees per tile (for testing)")
     args = parser.parse_args()
 
-    cfg = get_config()
-    case = args.case or cfg["case"]
-    n_cores = args.n_cores or cfg["default_cores"]
+    cfg = get_config(case_name=args.case, n_cores=args.n_cores)
+    case = cfg["case"]
+    n_cores = cfg["default_cores"]
+
 
     setup_logger(case, "tree_reconstruction", level=args.log_level)
 
