@@ -15,7 +15,7 @@ This project introduces a complete end-to-end workflow that reconstructs detaile
 The pipeline operates directly on unstructured lidar data and consists of three major components:
 
 1. **Data acquisition** — Automatic download, clipping, and preprocessing of AHN tiles for a user-defined area.  
-2. **Segmentation** — Novel *High-Order Multi-Echo Density (HOMED)* vegetation filtering and per-tree clustering via a modified *TreeSeparation* algorithm.  
+2. **Segmentation** — Novel *High-Order Multi-Echo Density (HOMED)* vegetation filtering and per-tree clustering via a modified [*TreeSeparation algorithm*](https://github.com/Jinhu-Wang/TreeSeparation) algorithm.  
 3. **Reconstruction** — Generation of CFD-ready watertight geometries (crown and trunk) using CGAL-based α-wrapping and per-tree metric extraction.
 
 The workflow has been applied to several major Dutch cities, including Amsterdam, Rotterdam, Utrecht, and Delft, reconstructing over 380,000 trees within practical runtimes (~13 hours for Amsterdam on 16 CPU cores).
@@ -24,7 +24,10 @@ The workflow has been applied to several major Dutch cities, including Amsterdam
 
 ## Pipeline Overview
 
-![Pipeline overview](docs/img/pipeline_overview.png)
+<p align="center">
+  <img src="docs/img/input_street.png" alt="Input point cloud data" width="48%" style="margin-right:2%;">
+  <img src="docs/img/output_street.png" alt="Reconstructed CFD-ready trees" width="48%">
+</p>
 
 ---
 
