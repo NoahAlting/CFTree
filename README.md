@@ -2,7 +2,7 @@
 
 This repository contains the code accompanying the MSc thesis:
 **From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction**  
-by **Noah Petri Alting**, MSc Geomatics, **TU Delft (2025)**.  
+by **Noah Alting**, MSc Geomatics, **TU Delft (2025)**.  
 The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries at the city scale, directly from open-access airborne lidar data [**AHN**](https://www.ahn.nl/).  
 
 
