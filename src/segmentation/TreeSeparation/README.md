@@ -1,7 +1,6 @@
 # TreeSeparation Integration
-
 This module integrates and adapts the **TreeSeparation** C++ implementation by  
-[Jinhu Wang](https://github.com/Jinhu-Wang/TreeSeparation), originally licensed under **LGPL-3.0**.
+[Jinhu Wang](https://github.com/Jinhu-Wang/TreeSeparation), originally licensed under **LGPL-3.0**, and is used in the **CFTree** pipeline for tree instance segmentation in point clouds.
 
 ## Overview
 TreeSeparation performs individual tree segmentation from airborne LiDAR point clouds.  

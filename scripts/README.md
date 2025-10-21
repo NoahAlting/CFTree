@@ -1,4 +1,4 @@
-# Scripts — Pipeline Execution
+# Scripts — CFTree Pipeline Execution
 
 This folder contains all high-level **orchestration scripts** for running the CFD-ready urban tree reconstruction pipeline.  
 Each script represents one stage of the workflow and can be executed independently or sequentially.

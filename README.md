@@ -30,7 +30,7 @@ The workflow has been applied to several major Dutch cities, including Amsterdam
 
 ## Repository Structure
 ``` bash
-cftree/
+CFTree/
 ├── cases/ # Case definitions and logs per study area
 ├── data/ # Intermediate and final outputs per case
 ├── resources/ # Static reference datasets (e.g., AHN tile index)
