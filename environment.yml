@@ -1,0 +1,56 @@
+name: cftree
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # --- Core Python ---
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+
+  # --- Geospatial stack ---
+  - geopandas
+  - shapely
+  - fiona
+  - rasterio
+  - pyproj
+  - rtree
+  - gdal
+  - pyogrio
+  - affine
+  - mapclassify
+
+  # --- Point cloud processing ---
+  - laspy
+  - python-pdal
+  - pdal
+  - richdem  # optional but common for DTM processing
+
+  # --- 3D geometry and visualization ---
+  - trimesh
+  - pyembree
+  - networkx
+  - matplotlib
+
+  # --- Parallelization and utilities ---
+  - joblib
+  - requests
+  - psutil
+
+  # --- C++ build toolchain (for AlphaWrap and TreeSeparation) ---
+  - cmake
+  - make
+  - gxx_linux-64        # Linux toolchain (use clangxx_osx-64 on macOS)
+  - boost-cpp
+  - eigen
+  - cgal
+
+  # --- Pip packages ---
+  - pip
+  - pip:
+      - cityjson
+      - pycityjson
+      - pdal-plugins
