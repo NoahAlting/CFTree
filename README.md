@@ -12,6 +12,15 @@ The project presents a fully automated, scalable pipeline that reconstructs CFD-
 Urban climate simulations increasingly rely on digital twins of cities, yet vegetation remains largely absent or oversimplified despite its strong influence on wind flow and heat exchange.  
 This project introduces a complete end-to-end workflow that reconstructs detailed, watertight, and physically meaningful tree models from raw airborne laser scanning (ALS) point clouds.  
 
+<p align="center">
+  <img src="docs/img/input_street.png" alt="Input point cloud data" width="48%" style="margin-right:2%;">
+  <img src="docs/img/output_street.png" alt="Reconstructed CFD-ready trees" width="48%">
+</p>
+
+--- 
+
+## Pipeline Overview
+
 The pipeline operates directly on unstructured lidar data and consists of three major components:
 
 1. **Data acquisition** — Automatic download, clipping, and preprocessing of AHN tiles for a user-defined area.  
@@ -20,16 +29,6 @@ The pipeline operates directly on unstructured lidar data and consists of three 
 
 The workflow has been applied to several major Dutch cities, including Amsterdam, Rotterdam, Utrecht, and Delft, reconstructing over 380,000 trees within practical runtimes (~13 hours for Amsterdam on 16 CPU cores).
 
----
-
-## Pipeline Overview
-
-<p align="center">
-  <img src="docs/img/input_street.png" alt="Input point cloud data" width="48%" style="margin-right:2%;">
-  <img src="docs/img/output_street.png" alt="Reconstructed CFD-ready trees" width="48%">
-</p>
-
----
 
 ## Repository Structure
 ``` bash
