@@ -115,7 +115,7 @@ def _compute_porosity(mesh: trimesh.Trimesh, pts_xyz: np.ndarray, voxel_size: fl
         return float(np.clip(porosity, 0, 1))
 
     except Exception as e:
-        logging.debug(f"Porosity computation failed: {e}")
+        logging.warning(f"Porosity computation failed: {e}")
         return np.nan
 
 
@@ -147,7 +147,7 @@ def _compute_r50(mesh: trimesh.Trimesh, pts_xyz: np.ndarray,
         return float(np.median(d))
 
     except Exception as e:
-        logging.debug(f"r50 computation failed: {e}")
+        logging.warning(f"r50 computation failed: {e}")
         return np.nan
 
 
@@ -207,7 +207,7 @@ def compute_trunk_base_from_dtm(
             rows, cols = np.where(~band.mask)
 
             if rows.size == 0:
-                logging.debug("No valid DTM pixels under crown footprint.")
+                logging.warning("No valid DTM pixels under crown footprint.")
                 return None
 
             xs, ys = rasterio.transform.xy(out_transform, rows, cols)
@@ -225,7 +225,7 @@ def compute_trunk_base_from_dtm(
             return np.array([bx, by, bz], dtype=np.float64)
 
     except Exception as e:
-        logging.debug(f"Trunk base extraction failed: {e}")
+        logging.warning(f"Trunk base extraction failed: {e}")
         return None
 
 

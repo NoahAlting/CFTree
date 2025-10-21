@@ -179,7 +179,7 @@ def construct_lod3(
         {"components": [ ... ], "attributes": OrderedDict([...])}
     """
     gtid_str = f"GTID {gtid}" if gtid is not None else "GTID ?"
-    logging.info(f"[{gtid_str}] Constructing LoD3 geometry...")
+    logging.debug(f"[{gtid_str}] Constructing LoD3 geometry...")
 
     components = []
 
@@ -229,7 +229,7 @@ def construct_lod3(
     attributes = _normalize_attributes(metrics, gtid or -1, tile_id)
 
     logging.info(
-        f"[{gtid_str}] Constructed {len(components)} LoD3 components "
+        f"[{tile_id}] [{gtid_str}] Constructed {len(components)} LoD3 components "
         f"(Crown={any(c['role']=='crown' for c in components)}, "
         f"Trunk={any(c['role']=='trunk' for c in components)})"
     )

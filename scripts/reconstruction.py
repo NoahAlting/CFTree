@@ -43,7 +43,7 @@ def warmup_once():
     _ = m.contains(np.array([[0.1,0.1,0.1],[2,2,2]], dtype=float))
     _ = m.voxelized(0.2).fill()
 
-    logging.info(f"[init] embree available: {trimesh.ray.has_embree}")
+    logging.debug(f"[init] embree available: {trimesh.ray.has_embree}")
 
 
 # ---------------------------------------------------------------------
@@ -107,11 +107,11 @@ def process_tile(
     city = init_cityjson()
     processed = 0
 
-
-    # test offset iteration
-    test_offset_iteration = 300 # remove before publication
     if max_trees: # limit number of trees for testing
-        unique_gtids = unique_gtids[test_offset_iteration:test_offset_iteration+max_trees]
+        unique_gtids = unique_gtids[:max_trees]
+
+    # log number of trees we are processing and say if there was a max_trees limit
+    logging.info(f"[{tile_id}] Processing {len(unique_gtids)} trees" + (f" (limited to max_trees={max_trees})" if max_trees else ""))
 
     for gtid in unique_gtids:                      
         logging.debug("="*40 + f"[{tile_id}] Processing GTID {gtid}")
@@ -125,7 +125,7 @@ def process_tile(
         pts = np.c_[las.x[idxs], las.y[idxs], las.z[idxs]]
         offset = pts.mean(axis=0)
         local_pts = pts - offset
-        logging.info(f"[{tile_id}] GTID {gtid}: localize point cloud (offset={offset})")
+        logging.debug(f"[{tile_id}] GTID {gtid}: localize point cloud (offset={offset})")
 
         xyz_path = cache_dir / f"tree_{gtid}.xyz"
         np.savetxt(xyz_path, local_pts, fmt="%.6f")
@@ -140,7 +140,7 @@ def process_tile(
         mesh = load_mesh(mesh_path)
 
         # Metrics
-        logging.info(f"[{tile_id}] GTID {gtid}: computing metrics")
+        logging.debug(f"[{tile_id}] GTID {gtid}: computing metrics")
         metrics = compute_tree_metrics(mesh, local_pts, dtm_path, offset)
         if metrics["status"] != "ok":
             logging.warning(f"[{tile_id}] GTID {gtid}: metric computation failed")
@@ -149,6 +149,10 @@ def process_tile(
 
         # Construct geometry (LoD3 only for now)
         tree_geom = construct_lod3(mesh, metrics, offset, gtid=int(gtid), tile_id=tile_id)
+        if not tree_geom["components"]:
+            logging.warning(f"[{tile_id}] GTID {gtid}: no geometry constructed")
+            del mesh, local_pts, res_alpha
+            continue
 
         # Add to CityJSON
         add_tree(city, int(gtid), tree_geom["components"], offset, tree_geom["attributes"])
@@ -186,7 +190,7 @@ def main():
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--keep-cache", action="store_true")
-    parser.add_argument("--max-trees", type=int, default=10, help="Limit number of trees per tile (for testing)")
+    parser.add_argument("--max-trees", type=int, default=None, help="Limit number of trees per tile (for testing)")
     args = parser.parse_args()
 
     cfg = get_config()
