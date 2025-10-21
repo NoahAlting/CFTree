@@ -54,7 +54,7 @@ def setup_logger(case: str, logfile_name: str, level: str = "INFO") -> Path:
     # UTC timestamps
     logging.Formatter.converter = lambda *args: datetime.now(timezone.utc).timetuple()
 
-    banner = f"\n=== NEW SESSION {datetime.now(timezone.utc).isoformat()}Z ==="
+    banner = "\n" + "="*40 + f" NEW SESSION {datetime.now(timezone.utc).isoformat()}Z" + "="*40 
     logging.info(banner)
     logging.info(f"Logging to: {log_path}")
     return log_path
