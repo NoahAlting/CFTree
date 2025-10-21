@@ -15,7 +15,7 @@ def query_tile_intersection(cfg, case, buffer=20.0):
     Replicates the logic from get_data.py.
     """
     aoi_path = cfg["case_root"] / case / "case_area.geojson"
-    tiles_path = cfg["resources_dir"] / "AHN_subunits_GeoTiles.shp"
+    tiles_path = cfg["resources_dir"] / "AHN_subunits_GeoTiles" / "AHN_subunits_GeoTiles.shp"
 
     # Load AOI and buffer it
     aoi = gpd.read_file(aoi_path).to_crs(cfg["crs"])
@@ -116,7 +116,7 @@ def main():
     cmd_segmentation = f"python -m scripts.segmentation {base_cmd}"
     cmd_reconstruction = f"python -m scripts.reconstruction {base_cmd}"
     if args.max_trees is not None:
-        cmd_reconstruction += f" --max-trees {args.max_trees}"
+        cmd_reconstruction += f" --max-trees {args.max_trees}" 
 
     # -------------------------------
     # Run stages sequentially
@@ -134,7 +134,7 @@ def main():
     run_stage("reconstruction", cmd_reconstruction)
 
     total_time = (time.time() - start) / 60
-    logger.info("=" * 40 + "\nPipeline complete")
+    logger.info("\n" + "=" * 60 + "Pipeline complete")
     logger.info(f"total elapsed time: {total_time:.2f} minutes")
 
 

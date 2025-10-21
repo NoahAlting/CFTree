@@ -27,7 +27,7 @@ from scipy import ndimage as ndi
 
 
 # ---------------------------------------------------------------------
-# Tunable parameters (identical to original script)
+# Tunable parameters 
 # ---------------------------------------------------------------------
 USE_AHN_CLASS_FILTER = False
 

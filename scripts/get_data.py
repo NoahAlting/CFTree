@@ -107,7 +107,7 @@ def main():
 
     aoi_path = cfg["case_path"] / "case_area.geojson"
     buffered_aoi_path = cfg["case_path"] / "case_area_buffered.geojson"
-    resources_dir = cfg["resources_dir"]
+    resources_dir = cfg["resources_dir"] 
     output_dir = cfg["data_case_path"]
 
     # ------------------------------------------------------------------
@@ -123,7 +123,7 @@ def main():
     # ------------------------------------------------------------------
     # Step 2: Determine intersecting tiles
     # ------------------------------------------------------------------
-    tiles = gpd.read_file(resources_dir / "AHN_subunits_GeoTiles.shp").to_crs(cfg["crs"])
+    tiles = gpd.read_file(resources_dir / "AHN_subunits_GeoTiles" / "AHN_subunits_GeoTiles.shp").to_crs(cfg["crs"])
     intersecting = tiles[tiles.intersects(aoi.union_all())]
     tile_ids = intersecting["GT_AHNSUB"].unique().tolist()
 

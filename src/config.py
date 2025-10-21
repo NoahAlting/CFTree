@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 CASE_CONFIGURATIONS = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
-    "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
+    "resources_dir": Path("resources"),
     "case": "wippolder",                    # test case
     "default_cores": 2,                     # Global default for parallelization
     "crs": "EPSG:28992",                    # Amersfoort / RD New
