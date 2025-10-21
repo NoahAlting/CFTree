@@ -1,132 +1,144 @@
-# 🌳 CFTree — Get Point Clouds Pipeline
-> Automated retrieval and clipping of AHN LiDAR tiles for digital-twin tree modeling.
+# From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction
 
-This repository contains the **`run_get_pointclouds`** pipeline, which automates the process of **downloading and clipping AHN LiDAR tiles** based on a case-specific area of interest (AOI).  
-It is the first step in the broader **CFTree digital twin workflow** for generating 3D tree models for CFD simulations.
-
----
-
-## 🧭 What the Script Does
-
-`scripts/run_get_pointclouds.py` performs the following steps:
-
-1. **Load AOI**  
-   Reads the case polygon from  
-   `cases/<case>/city_bbox.geojson`.
-
-2. **Buffer the AOI**  
-   Expands the polygon (default: 20 meters) to ensure all relevant tiles are included.  
-   Saved as `city_bbox_buffered.geojson`.
-
-3. **Find Intersecting Tiles**  
-   Uses the reference shapefile  
-   `resources/AHN_subunits_GeoTiles.shp`  
-   to determine which AHN tiles intersect the buffered AOI.
-
-4. **Parallel Download of Tiles**  
-   For each intersecting tile:
-   - Downloads the corresponding `.LAZ` and `.LAX` files from the AHN web service.
-   - Stores them in  
-     `data/<case>/tiles/<tile_id>/raw.laz` and `raw.lax`.
-
-5. **Clip Tiles**  
-   Each downloaded tile is clipped to the buffered AOI using PDAL (via a robust bash pipeline).  
-   The output is saved as  
-   `data/<case>/tiles/<tile_id>/clipped.laz`.
-
-6. **Logging**  
-   All operations are logged in  
-   `cases/<case>/logs/get_pointclouds.log`  
-   with UTC timestamps and a session header.
+This repository contains the code accompanying the MSc thesis **"From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction"**  
+by **Noah Petri Alting**, MSc Geomatics, **TU Delft (2025)**.  
+The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries directly from open-access airborne LiDAR data (AHN).  
 
 ---
 
-## ⚙️ Configuration
+## Overview
 
-All global settings (paths, default case, and core count) are defined in `src/config.py`:
+Urban climate simulations increasingly rely on digital twins of cities, yet vegetation remains largely absent or oversimplified despite its strong influence on wind flow and heat exchange.  
+This project introduces a complete end-to-end workflow that reconstructs detailed, watertight, and physically meaningful tree models from raw airborne laser scanning (ALS) point clouds.  
 
-```python
-DEFAULTS = {
-    "case_root": Path("cases"),
-    "data_root": Path("data"),
-    "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
-    "case": "wippolder",
-    "default_cores": 2,
-}
+The pipeline operates directly on unstructured LiDAR data and consists of three major components:
 
-```
+1. **Data acquisition** — Automatic download, clipping, and preprocessing of AHN tiles for a user-defined area.  
+2. **Segmentation** — Novel *High-Order Multi-Echo Density (HOMED)* vegetation filtering and per-tree clustering via a modified *TreeSeparation* algorithm.  
+3. **Reconstruction** — Generation of CFD-ready watertight geometries (crown and trunk) using CGAL-based α-wrapping and per-tree metric extraction.
 
-## 🧩 Setup
+The workflow has been applied to several major Dutch cities, including Amsterdam, Rotterdam, Utrecht, and Delft, reconstructing over 380,000 trees within practical runtimes (~13 hours for Amsterdam on 16 CPU cores).
 
-Create and activate the environment (recommended):
+---
+
+## Pipeline Overview
+
+![Pipeline overview](docs/img/pipeline_overview.png)
+
+---
+
+## Repository Structure
+
+cftree/
+├── cases/ # Case definitions and logs per study area
+├── data/ # Intermediate and final outputs per case
+├── resources/ # Static reference datasets (e.g., AHN tile index)
+├── scripts/ # Orchestration scripts for each pipeline step
+└── src/ # Core modules (data, segmentation, reconstruction)
+
+
+---
+
+## Pipeline Workflow
+
+### 1. Data Acquisition (`get_data`)
+- Input: `cases/<case_name>/city_bbox.geojson`
+- Downloads and clips AHN5 LiDAR tiles and digital terrain models (DTM) for the specified area.
+- Outputs stored under `data/<case_name>/tiles/<tile_id>/`.
+
+### 2. Tree Segmentation (`segmentation`)
+- Applies the **HOMED** vegetation filter to isolate vegetation points.
+- Segments individual trees using a modified **TreeSeparation** algorithm (C++).
+- Produces per-tree point clusters and a harmonized forest-level point cloud (`forest.laz`) with global tree identifiers (`gtid`).
+
+### 3. Geometry Reconstruction (`reconstruction`)
+- For each segmented tree:
+  - Generates local coordinate systems for efficiency.
+  - Reconstructs watertight meshes using the **CGAL 3D Alpha Wrapping** algorithm.
+  - Derives morphological attributes (e.g., crown width, height, trunk dimensions).
+  - Constructs LOD3-level crown and trunk geometries.
+- Exports per-tile CityJSON files with full geometric and attribute information.
+
+---
+
+## Installation
+
+This repository uses a Conda environment for reproducibility.
+
 ```bash
 conda env create -f environment.yml
 conda activate cftree
 ```
-Then verify configuration:
-``` bash
-python -m src.config
+Ensure sufficient storage capacity (≥100 GB recommended for full-city processing).
+The data path can be configured in src/config.py.
+
+## Quickstart example
+1. Define your area of interest in:
+```bash 
+cases/<case_name>/city_bbox.geojson
+```
+2. Set case variables in src/config.py, defaults for example run are:
+``` python
+DEFAULTS = {
+    "case_root": Path("cases"),             # user case input directory
+    "data_root": Path("data"),              # data storage root (large files)
+    "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
+    "case": "wippolder",                    # test case
+    "default_cores": 2,                     # Global default for parallelization
+    "crs": "EPSG:28992",                    # Amersfoort / RD New
+}
 ```
 
-This prints all active paths and confirms directories exist.
-
-
-
-
-## 🚀 How to Run
-
-### Default run (uses config defaults)
+3. Run the full pipeline:
 ``` bash
-python -m scripts.run_get_pointclouds
+python -m scripts.run_get_data
+python -m scripts.run_segmentation
+python -m scripts.run_tree_reconstruction
+```
+If desired, each stage can be overwritten:
+``` bash
+--case <path> # path to case to run
+--n-cores <number_of_cores> # number of available cores for paralellisation
+--log-level <[INFO, WARNING, DEBUG]
+--overwrite # overwrite existing files
+--dry-run # only list tiles
+```
+Logs for each run are stored under:
+``` bash
+cases/<case_name>/logs/
 ```
 
-Runs for:
-
-- case = wippolder
-- default_cores = 2
-- buffer = 20 meters
-- overwrite = False
-
-
-### overwrite settings
+## Outputs
+Each fully processed tile will contain:
 ``` bash
-python -m scripts.run_get_pointclouds --case delft --n-cores 4 --buffer 20 --overwrite
+clipped.laz
+clipped_dtm.tif
+vegetation.laz
+vegetation.xyz
+segmentation.xyz
+forest.laz
+tree_hulls.geojson
+trees_lod3.city.json
+```
+Case-level aggregated outputs:
+``` bash
+data/<case_name>/forest_hulls.geojson
+data/<case_name>/gtid_map.csv
 ```
 
-### Dry-run mode (list intersecting tiles only)
-``` bash
-python -m scripts.run_get_pointclouds --dry-run
-```
+## Performance
+| City      | # Trees | Runtime (16 cores) | Notes                       |
+| --------- | ------- | ------------------ | --------------------------- |
+| Amsterdam | ~380k   | ~13 h              | Full pipeline, AHN5 dataset |
+| Rotterdam | ~210k   | ~7 h               |                             |
+| Utrecht   | ~150k   | ~5 h               |                             |
+| Delft     | ~90k    | ~3 h               |                             |
 
-### Background (detached) run
-``` bash
-nohup python -m scripts.run_get_pointclouds > cases/wippolder/logs/run.out 2>&1 &
-```
+## Thesis Reference
+This repository accompanies the MSc thesis:
+Noah Petri Alting (2025). “From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.”
+Delft University of Technology, Faculty of Architecture and the Built Environment.
+Available soon at: https://repository.tudelft.nl/
 
-
-## 📂 Output Structure
-After running the pipeline, your folders will look like:
-``` bash
-cases/wippolder/
-├── city_bbox.geojson
-├── city_bbox_buffered.geojson
-└── logs/
-    └── get_pointclouds.log
-
-data/wippolder/tiles/
-├── 37EN2_11/
-│   ├── raw.laz
-│   ├── raw.lax
-│   └── clipped.laz
-└── 37EN2_12/
-    ├── raw.laz
-    ├── raw.lax
-    └── clipped.laz
-```
-
-
-## 🧩 Notes
-- The clipping step uses PDAL through src/get_pointclouds/tiles_clipper_robust.sh.
-- The resources directory (resources/AHN_subunits_GeoTiles) is static and read-only.
-- Logs and buffered AOIs are not versioned (.gitignore excludes them).
-- Future steps (segmentation, classification, reconstruction) will follow this same structure.
+## license
+???
