@@ -5,7 +5,7 @@ Assigns global tree IDs (GTIDs) to segmented trees across all tiles of a case,
 removes trees outside the AOI, and enriches vegetation.laz with GTIDs.
 
 Reads:
-    cases/<case>/city_bbox.geojson
+    cases/<case>/case_area.geojson
     data/<case>/tiles/<tile_id>/tree_hulls.geojson
     data/<case>/tiles/<tile_id>/segmentation.xyz
     data/<case>/tiles/<tile_id>/vegetation.laz
@@ -46,7 +46,7 @@ def generalize_forest_ids(case: str, overwrite: bool = False) -> dict:
     # ------------------------------------------------------------------
     # Load AOI polygon
     # ------------------------------------------------------------------
-    aoi_path = Path("cases") / case / "city_bbox.geojson"
+    aoi_path = Path("cases") / case / "case_area.geojson"
     if not aoi_path.exists():
         logging.error(f"AOI not found: {aoi_path}")
         return {"case": case, "status": "missing_aoi"}

@@ -51,6 +51,6 @@ dependencies:
   # --- Pip packages ---
   - pip
   - pip:
-      - cityjson
+      # - cityjson
       - pycityjson
       - pdal-plugins

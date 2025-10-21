@@ -41,7 +41,7 @@ CFTree/
 ## Pipeline Workflow
 
 ### 1. Data Acquisition (`get_data`)
-- Input: `cases/<case_name>/city_bbox.geojson`
+- Input: `cases/<case_name>/case_area.geojson`
 - Downloads and clips AHN5 LiDAR tiles and digital terrain models (DTM) for the specified area.
 - Outputs stored under `data/<case_name>/tiles/<tile_id>/`.
 
@@ -76,7 +76,7 @@ The data path can be configured in `src/config.py`.
 
 ### 1. Define your area of interest in:
 ```bash 
-cases/<case_name>/city_bbox.geojson
+cases/<case_name>/case_area.geojson
 ```
 ### 2. Set case variables in `src/config.py`, defaults for example run are:
 ``` python

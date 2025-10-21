@@ -7,7 +7,7 @@ Each script represents one stage of the workflow and can be executed independent
 
 ### Input Requirements:
 Each case must be initialized by case folder holding a polygon of the desired area to process in geojson format. 
-For testing, an example neighbourhood of the city of Delft is provided: `/cases/wippolder/city_bbox.geojson`.
+For testing, an example neighbourhood of the city of Delft is provided: `/cases/wippolder/case_area.geojson`.
 
 Global, case-specific configurations can be set in `/src/config.py` and is automatically propagated to all modules.
 ``` python
@@ -67,7 +67,7 @@ Downloads and prepares AHN5 tiles for the selected case.
 Performs download, clipping, and DTM generation.
 
 ### Main steps:
-1. Buffer the case polygon (`city_bbox.geojson`).
+1. Buffer the case polygon (`case_area.geojson`).
 2. Find intersecting AHN5 tiles.
 3. Download raw `.laz` files from [TU Delft GeoTiles server](https://geotiles.citg.tudelft.nl/AHN5_T).
 4. Clip tiles to AOI and compute `clipped_dtm.tif`.

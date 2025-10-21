@@ -105,8 +105,8 @@ def main():
     logging.info(f"Parallel workers: {n_cores} (from {'CLI' if args.n_cores else 'config'})")
     logging.info(f"Buffer distance: {args.buffer} m")
 
-    aoi_path = cfg["case_path"] / "city_bbox.geojson"
-    buffered_aoi_path = cfg["case_path"] / "city_bbox_buffered.geojson"
+    aoi_path = cfg["case_path"] / "case_area.geojson"
+    buffered_aoi_path = cfg["case_path"] / "case_area_buffered.geojson"
     resources_dir = cfg["resources_dir"]
     output_dir = cfg["data_case_path"]
 

@@ -7,9 +7,9 @@
 # ----------------------------
 cases/*
 !cases/wippolder/
-!cases/wippolder/city_bbox.geojson
+!cases/wippolder/case_area.geojson
 !cases/README.md
-cases/*/city_bbox_buffered.geojson
+cases/*/case_area_buffered.geojson
 cases/*/logs/
 cases/*/*.log
 
