@@ -5,7 +5,6 @@ This repository contains the code accompanying the MSc thesis:
 by **Noah Petri Alting**, MSc Geomatics, **TU Delft (2025)**.  
 The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries at the city scale, directly from open-access airborne lidar data [**AHN**](https://www.ahn.nl/).  
 
----
 
 ## Overview
 
@@ -17,7 +16,6 @@ This project introduces a complete end-to-end workflow that reconstructs detaile
   <img src="docs/img/output_street.png" alt="Reconstructed CFD-ready trees" width="48%">
 </p>
 
---- 
 
 ## Pipeline Overview
 
@@ -40,8 +38,6 @@ cftree/
 └── src/ # Core modules (data, segmentation, reconstruction)
 ```
 
----
-
 ## Pipeline Workflow
 
 ### 1. Data Acquisition (`get_data`)
@@ -62,7 +58,7 @@ cftree/
   - Constructs LOD3-level crown and trunk geometries.
 - Exports per-tile CityJSON files with full geometric and attribute information.
 
----
+For detailed execution instructions, see `/scripts/README.md`.
 
 ## Installation
 
@@ -73,19 +69,21 @@ conda env create -f environment.yml
 conda activate cftree
 ```
 Ensure sufficient storage capacity (≥100 GB recommended for full-city processing).
-The data path can be configured in src/config.py.
+The data path can be configured in `src/config.py`.
 
----
 
 ## Quickstart example
 
-1. Define your area of interest in:
+### 1. Define your area of interest in:
 ```bash 
 cases/<case_name>/city_bbox.geojson
 ```
-2. Set case variables in src/config.py, defaults for example run are:
+### 2. Set case variables in `src/config.py`, defaults for example run are:
 ``` python
-DEFAULTS = {
+# ---------------------------------------------------------------------
+# Case configurations used throughout the pipeline
+# ---------------------------------------------------------------------
+CASE_CONFIGURATIONS = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
     "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
@@ -95,11 +93,14 @@ DEFAULTS = {
 }
 ```
 
-3. Run the full pipeline:
+### 3. Build the cpp files.
+Detailed instructions see `src/segmentation/TreeSeparation/README.md` and `src/reconstruction/AlphaWrap/README.md`.
+
+### 4. Run the full pipeline:
 ``` bash
-python -m scripts.run_get_data
-python -m scripts.run_segmentation
-python -m scripts.run_tree_reconstruction
+python -m scripts.get_data
+python -m scripts.segmentation
+python -m scripts.tree_reconstruction
 ```
 If desired, each stage can be overwritten:
 ``` bash
@@ -113,8 +114,6 @@ Logs for each run are stored under:
 ``` bash
 cases/<case_name>/logs/
 ```
-
----
 
 ## Outputs
 Each fully processed tile will contain:
@@ -134,8 +133,6 @@ data/<case_name>/forest_hulls.geojson
 data/<case_name>/gtid_map.csv
 ```
 
----
-
 ## Performance
 | City      | # Trees | Runtime (16 cores) | Notes                       |
 | --------- | ------- | ------------------ | --------------------------- |
@@ -144,7 +141,6 @@ data/<case_name>/gtid_map.csv
 | Utrecht   | ~150k   | ~5 h               |                             |
 | Delft     | ~90k    | ~3 h               |                             |
 
----
 
 ## Acknoledgements
 This repository is part of my MSc thesis:
@@ -153,7 +149,6 @@ at the Delft University of Technology, Faculty of Architecture and the Built Env
 Available soon at: https://repository.tudelft.nl/
 
 Supervised by: Dr. Hugo Ledoux and Dr. Clara García Sánchez
----
 
 ## license
 ???

@@ -8,9 +8,9 @@ import logging
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------------
-# Defaults
+# Case configurations used throughout the pipeline
 # ---------------------------------------------------------------------
-DEFAULTS = {
+CASE_CONFIGURATIONS = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
     "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
@@ -31,7 +31,7 @@ def setup_logger(case: str, logfile_name: str, level: str = "INFO") -> Path:
     - Uses UTC ISO-8601 timestamps.
     - Adds a NEW SESSION banner at start.
     """
-    case_root = DEFAULTS["case_root"]
+    case_root = CASE_CONFIGURATIONS["case_root"]
     case_path = case_root / case
     log_dir = case_path / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -67,7 +67,7 @@ def get_config() -> dict:
     """
     Return resolved configuration with canonical paths and compute settings.
     """
-    cfg = DEFAULTS.copy()
+    cfg = CASE_CONFIGURATIONS.copy()
 
     case_name = cfg["case"]
 
