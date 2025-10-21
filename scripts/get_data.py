@@ -29,7 +29,7 @@ def process_tile(tile_id: str, output_dir: Path, base_url: str, overwrite: bool,
         # ---------------------------
         # 1. Download raw tile
         # ---------------------------
-        result_dl = download_tile(tile_id, output_dir, base_url, overwrite)
+        result_dl = download_tile(tile_id, output_dir, base_url, overwrite=overwrite)
         laz_path = result_dl.get("paths", {}).get("laz")
 
         if result_dl["status"] != "ok" or not laz_path or not Path(laz_path).exists():
@@ -38,7 +38,7 @@ def process_tile(tile_id: str, output_dir: Path, base_url: str, overwrite: bool,
         # ---------------------------
         # 2. Clip tile to AOI
         # ---------------------------
-        result_clip = clip_tile(Path(laz_path), aoi_path)
+        result_clip = clip_tile(Path(laz_path), aoi_path, overwrite=overwrite)
         if result_clip["status"] != "ok":
             return {"tile_id": tile_id, "status": result_clip["status"]}
 
