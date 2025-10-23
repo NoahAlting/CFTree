@@ -1,6 +1,10 @@
-"""
-src/segmentation/segment_tile.py
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
 
+# src/segmentation/segment_tile.py
+
+"""
 Wrapper for the C++ TreeSeparation segmentation binary.
 
 Reads:

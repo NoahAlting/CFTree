@@ -1,3 +1,9 @@
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
+
+# src/get_data/tiles_clipper_robust.sh
+
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
 # Clip a single LAZ file using PDAL crop filter.

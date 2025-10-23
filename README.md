@@ -87,7 +87,7 @@ cases/<case_name>/case_area.geojson
 DEFAULT_CONFIG = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
-    "resources_dir": Path("resources"),
+    "resources_dir": Path("resources"),     # shared resources
     "case": "wippolder",                    # default case
     "default_cores": 2,                     # global default for parallelization
     "crs": "EPSG:28992",                    # Amersfoort / RD New

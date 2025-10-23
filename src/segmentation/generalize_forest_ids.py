@@ -1,6 +1,10 @@
-"""
-src/segmentation/generalize_forest_ids.py
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
 
+# src/segmentation/generalize_forest_ids.py
+
+"""
 Assigns global tree IDs (GTIDs) to segmented trees across all tiles of a case,
 removes trees outside the AOI, and enriches vegetation.laz with GTIDs.
 

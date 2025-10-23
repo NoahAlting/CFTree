@@ -1,4 +1,9 @@
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
+
 # src/reconstruction/construct_geometry.py
+
 """
 Construct LoD3 tree geometries (crown + trunk) in local coordinates.
 

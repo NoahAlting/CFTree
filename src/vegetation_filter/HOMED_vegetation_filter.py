@@ -1,6 +1,10 @@
-"""
-src/vegetation_filter/HOMED_vegetation_filter.py
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
 
+# src/vegetation_filter/HOMED_vegetation_filter.py
+
+"""
 HOMED vegetation filter — isolates vegetation points from a clipped AHN tile.
 
 Reads:

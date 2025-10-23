@@ -1,4 +1,9 @@
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
+
 # src/reconstruction/write_cityjson.py
+
 """
 Assemble and finalize CityJSON tiles for tree geometries (LoD3).
 

@@ -1,3 +1,7 @@
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
+
 # src/reconstruction/extract_tree_metrics.py
 """
 Compute all per-tree geometric and allometric metrics.

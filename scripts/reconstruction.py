@@ -1,3 +1,7 @@
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
+
 #!/usr/bin/env python
 """
 scripts/run_tree_reconstruction.py

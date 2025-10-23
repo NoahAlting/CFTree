@@ -1,6 +1,10 @@
-"""
-src/reconstruction/alpha_wrap_tree.py
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
 
+# src/reconstruction/alpha_wrap_tree.py
+
+"""
 Python interface for per-tree alpha wrapping using the CGAL CLI binary.
 
 Wraps: src/reconstruction/AlphaWrap/build/awrap_points

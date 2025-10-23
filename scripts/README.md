@@ -14,12 +14,12 @@ Global, case-specific configurations can be set in `/src/config.py` and is autom
 # ---------------------------------------------------------------------
 # Case configurations used throughout the pipeline
 # ---------------------------------------------------------------------
-CASE_CONFIGURATIONS = {
+DEFAULT_CONFIG = {
     "case_root": Path("cases"),             # user case input directory
     "data_root": Path("data"),              # data storage root (large files)
-    "resources_dir": Path("resources/AHN_subunits_GeoTiles"),
-    "case": "wippolder",                    # test case
-    "default_cores": 2,                     # Global default for parallelization
+    "resources_dir": Path("resources"),     # shared resources
+    "case": "wippolder",                    # default case
+    "default_cores": 2,                     # global default for parallelization
     "crs": "EPSG:28992",                    # Amersfoort / RD New
 }
 ```
@@ -49,7 +49,7 @@ Logs and outputs are structured per case for traceability.
 
 ### Shared CLI Parameters
 
-All scripts accept the following common flags:
+All scripts accept the following common flags to overwrite the default settings:
 
 | Flag | Type | Description |
 |------|------|--------------|

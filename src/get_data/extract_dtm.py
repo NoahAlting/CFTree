@@ -1,7 +1,9 @@
-"""
-src/get_data/extract_dtm.py
-Compute a DTM from a clipped LAZ tile using PDAL.
-"""
+# Copyright (C) 2025 Noah Alting
+# Licensed under the GNU General Public License v3.0
+# See the LICENSE file for more details.
+
+# src/get_data/extract_dtm.py
+
 
 import pdal
 import json
