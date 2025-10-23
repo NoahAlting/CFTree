@@ -164,7 +164,7 @@ data/<case_name>/gtid_map.csv
 | Delft     | ~90k    | ~3 h               |                             |
 
 
-## 8 Acknowledgements
+## 8 Acknowledgements and Contact
 This repository is part of my MSc thesis:
 “From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.”
 at the Delft University of Technology, Faculty of Architecture and the Built Environment.  
@@ -172,8 +172,9 @@ This thesis will become available soon at: https://repository.tudelft.nl/
 
 Supervised by: Dr. Hugo Ledoux and Dr. Clara García Sánchez
 
-For questions or collaborations, feel free to contact me:  
-**Noah Alting** – noahalting (at) gmail.com
+For questions or collaborations, feel free to contact me via:  
+- Email: noahalting (at) gmail.com  
+- [LinkedIn](https://www.linkedin.com/in/noah-alting-6b041916b)
 
 
 ## 9 license
