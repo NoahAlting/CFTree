@@ -1,9 +1,13 @@
-# From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction
+# CFTree
 
-This repository contains the code accompanying the MSc thesis:
-**From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction**  
-by **Noah Alting**, MSc Geomatics, **TU Delft (2025)**.  
-The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries at the city scale, directly from open-access airborne lidar data [**AHN**](https://www.ahn.nl/).  
+**Author:** Noah Alting (MSc Geomatics, TU Delft, 2025)  
+**License:** [GPL-3.0](./LICENSE)
+
+This repository contains the code accompanying the MSc thesis  
+**“From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction”**,  
+submitted at the Delft University of Technology, Faculty of Architecture and the Built Environment.  
+
+The project presents a fully automated, scalable pipeline that reconstructs CFD-ready 3D tree geometries at the city scale, directly from open-access airborne lidar data ([AHN](https://www.ahn.nl/)).
 
 
 ## Overview
@@ -73,7 +77,7 @@ conda activate cftree
 
 > **NOTE:** Creating the environment may take a while, don't worry!
 
-## Quickstart example
+## Quickstart Example
 
 ### 1. Define your area of interest in:
 ```bash 
@@ -137,7 +141,7 @@ Optional arguments (same as for individual stages):
 
 Logs summary and timing for each stage are written to `cases/<case_name>/logs/main.log`.
 
-## 6 Outputs
+## Outputs
 Each fully processed tile will contain:
 ``` bash
 clipped.laz
@@ -155,7 +159,7 @@ data/<case_name>/forest_hulls.geojson
 data/<case_name>/gtid_map.csv
 ```
 
-## 7 Performance
+## Performance
 | City      | # Trees | Runtime (16 cores) | Notes                       |
 | --------- | ------- | ------------------ | --------------------------- |
 | Amsterdam | ~380k   | ~13 h              | Full pipeline, AHN5 dataset |
@@ -164,7 +168,7 @@ data/<case_name>/gtid_map.csv
 | Delft     | ~90k    | ~3 h               |                             |
 
 
-## 8 Acknowledgements and Contact
+## Acknowledgements and Contact
 This repository is part of my MSc thesis:
 “From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.”
 at the Delft University of Technology, Faculty of Architecture and the Built Environment.  
@@ -177,7 +181,16 @@ For questions or collaborations, feel free to contact me via:
 - [LinkedIn](https://www.linkedin.com/in/noah-alting-6b041916b)
 
 
-## 9 license
+## How to Cite
+
+If you use this code or parts of it in your research, please cite the corresponding MSc thesis:
+
+**Alting, N.** (2025). *From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.*  
+MSc Thesis, Delft University of Technology, Faculty of Architecture and the Built Environment.  
+Available soon at: [https://repository.tudelft.nl/](https://repository.tudelft.nl/)
+
+
+## License
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
