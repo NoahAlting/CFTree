@@ -31,11 +31,11 @@ The workflow has been applied to several major Dutch cities, including Amsterdam
 ## Repository Structure
 ``` bash
 CFTree/
-├── cases/ # Case definitions and logs per study area
-├── data/ # Intermediate and final outputs per case
-├── resources/ # Static reference datasets (e.g., AHN tile index)
-├── scripts/ # Orchestration scripts for each pipeline step
-└── src/ # Core modules (data, segmentation, reconstruction)
+├── cases/      # Case definitions and logs per study area
+├── data/       # Intermediate and final outputs per case
+├── resources/  # Static reference datasets (e.g., AHN tile index)
+├── scripts/    # Orchestration scripts for each pipeline step
+└── src/        # Core modules (data, segmentation, reconstruction)
 ```
 
 ## Pipeline Workflow
@@ -97,7 +97,7 @@ DEFAULT_CONFIG = {
 ### 3. Build the cpp files.
 Detailed instructions see `src/segmentation/TreeSeparation/README.md` and `src/reconstruction/AlphaWrap/README.md`.
 
-### 4. Run pipeline steps individually:
+### 4. Run the pipeline steps individually:
 ``` bash
 python -m scripts.get_data
 python -m scripts.segmentation
