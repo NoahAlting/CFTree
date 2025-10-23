@@ -21,10 +21,10 @@ The geometric and algorithmic behavior of the original example remains unchanged
 ## Build Instructions
 Requires **CMake ≥ 3.18** and a **C++17-compatible compiler** (`g++` or `clang++`).
 
-```bash
+``` bash
 cd src/reconstruction/AlphaWrap
 mkdir -p build && cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j$(nproc)
 ```
 
@@ -32,12 +32,18 @@ This will compile the executable awrap_points inside the `build/` directory.
 Ensure this binary is built and accessible before running `scripts/tree_reconstruction.py`.
 
 ## Dependencies
-| Library                                | Purpose                     |
-| -------------------------------------- | --------------------------- |
-| [CGAL](https://www.cgal.org/) ≥ 5.5    | Core Alpha Wrapping library |
-| CMake, Make, g++ / clang++             | Build toolchain             |
+| Library                                                    | Purpose                               |
+| ---------------------------------------------------------- | ------------------------------------- |
+| [CGAL](https://www.cgal.org/) ≥ 5.5                        | Core Alpha Wrapping library           |
+| [Boost](https://www.boost.org/) ≥ 1.66                     | Utility headers used by CGAL          |
+| [Eigen3](https://eigen.tuxfamily.org/)                     | Linear algebra backend                |
+| [GMP](https://gmplib.org/) & [MPFR](https://www.mpfr.org/) | Exact arithmetic (included with CGAL) |
+| CMake, Make, g++ / clang++                                 | Build toolchain                       |
 
-If using Conda:
+
+> **Tip:** If you’re using the provided environment.yml, all required C++ libraries (CGAL, Boost, Eigen, GMP, MPFR) are already included. No additional setup is needed.
+
+Otherwise add the dependencies manually:
 ``` bash
 conda install -c conda-forge cgal boost-cpp eigen cmake make gxx_linux-64
 ```

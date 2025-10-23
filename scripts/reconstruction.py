@@ -117,6 +117,8 @@ def process_tile(
         logging.debug("="*40 + f"[{tile_id}] Processing GTID {gtid}")
 
         idxs = np.where(las["gtid"] == gtid)[0]
+
+        # Skip trees too small for reconstruction
         if idxs.size < 50:
             logging.debug(f"[{tile_id}] GTID {gtid}: {idxs.size} pts < 50, skip")
             continue

@@ -173,4 +173,12 @@ Available soon at: https://repository.tudelft.nl/
 Supervised by: Dr. Hugo Ledoux and Dr. Clara García Sánchez
 
 ## 9 license
-???
+
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
+
+It includes and modifies components from:
+- [TreeSeparation](https://github.com/Jinhu-Wang/TreeSeparation) (originally LGPL-3.0)
+- [CGAL Alpha Wrap 3 example](https://doc.cgal.org/latest/Alpha_wrap_3/) (GPL-3.0)
+
+Therefore, the entire project is distributed under the GNU General Public License v3.0.
+See the [LICENSE](./LICENSE) file for details.

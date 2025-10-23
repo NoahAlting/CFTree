@@ -125,7 +125,7 @@ def main():
     logger.info("\n" + "=" * 60 + "Starting full CFTree pipeline")
     logger.info("=" * 20 + " Stage 1: Data Acquisition")
     logger.info(f"buffer distance: {args.buffer} m")
-    logger.info(f'running...\t ETA = ~ {len(tile_ids) / n_cores * 1.2} minutes (assuming ~1.2 min per tile)')
+    logger.info(f'running...\t ETA = ~ {len(tile_ids) / n_cores * 2.0} minutes (assuming ~2.0 min per tile)')
     run_stage("get_data", cmd_get_data)
 
     logger.info("=" * 20 + " Stage 2: Segmentation")
