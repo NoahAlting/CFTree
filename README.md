@@ -103,7 +103,7 @@ python -m scripts.get_data
 python -m scripts.segmentation
 python -m scripts.tree_reconstruction
 ```
-If desired, each stage can be overwritten:
+If desired, each stage can have the settings defined in `src/config.py` be overwritten:
 ``` bash
 --case <path>                       # path to case to run
 --n-cores <number_of_cores>         # number of available cores for paralellisation
