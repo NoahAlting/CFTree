@@ -172,7 +172,7 @@ data/<case_name>/gtid_map.csv
 This repository is part of my MSc thesis:
 “From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.”
 at the Delft University of Technology, Faculty of Architecture and the Built Environment.  
-This thesis will become available soon at: https://repository.tudelft.nl/
+This thesis is available at the [TU Delft Repository](https://resolver.tudelft.nl/uuid:adc9c299-b8f7-4854-b004-dcf2393d06fb).
 
 Supervised by: Dr. Hugo Ledoux and Dr. Clara García Sánchez
 
@@ -187,7 +187,7 @@ If you use this code or parts of it in your research, please cite the correspond
 
 **Alting, N.** (2025). *From Point Clouds to Porous Crowns: A Scalable Approach for CFD-Ready Urban Tree Reconstruction.*  
 MSc Thesis, Delft University of Technology, Faculty of Architecture and the Built Environment.  
-Available soon at: [https://repository.tudelft.nl/](https://repository.tudelft.nl/)
+To reference this document use: [https://resolver.tudelft.nl/uuid:adc9c299-b8f7-4854-b004-dcf2393d06fb](https://repository.tudelft.nl/)
 
 
 ## License
